@@ -1,0 +1,7 @@
+[project]
+name = "nba-insights-engine"
+version = "0.1.0"
+description = "Answer user questions by querying a NBA SQL database using LLMs."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
