@@ -9,3 +9,18 @@ def get_player_names() -> list[str]:
 def get_team_names() -> list[str]:
     """Retrieve list of team names available in the database."""
     return [e[0] for e in con.sql("select distinct team_name from team").fetchall()]
+
+
+def get_table_columns(table_name: str) -> list[str, str]:
+    """Retrieve list of columns name and type for a given table."""
+    return [
+        e
+        for e in con.sql(
+            f"select column_name, data_type from information_schema.columns where table_name = '{table_name}'"
+        ).fetchall()
+    ]
+
+
+def get_tables() -> list[str]:
+    """Retrieve list of tables available in the database."""
+    return [e[0] for e in con.sql("select table_name from information_schema.tables").fetchall()]
