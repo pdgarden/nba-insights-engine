@@ -31,4 +31,4 @@ extend-select = [
     'TRY', 'FLY', 'NPY', 'PLC', 'PLE', 'PLW', 'I',
     ]
 
-ignore = ['S608']
+ignore = ['S608', 'ANN401']
