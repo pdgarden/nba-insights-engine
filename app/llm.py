@@ -53,12 +53,7 @@ def query_llm(
 
     else:
         response = (
-            client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "user", "content": prompt},
-                ],
-            )
+            client.chat.completions.create(model=model, messages=[{"role": "user", "content": prompt}])
             .choices[0]
             .message.content
         )
