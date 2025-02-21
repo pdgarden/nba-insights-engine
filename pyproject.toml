@@ -9,6 +9,7 @@ dependencies = [
     "numpy>=2.2.3",
     "openai>=1.63.2",
     "pandas>=2.2.3",
+    "pydantic-settings>=2.8.0",
     "pydantic>=2.10.6",
     "streamlit>=1.42.2",
 ]
