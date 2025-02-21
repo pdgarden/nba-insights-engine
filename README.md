@@ -21,7 +21,7 @@ generates a SQL query executed in backend. The query result is then used to answ
 
 Example of questions:
 - What is the highest number of points scored by lebron james in a single game?
-- What are the top 5 players with the most points in the 2022-2023 season?
+- What are the top 5 players with the most points per games in the 2022-2023 season?
 
 
 
@@ -71,7 +71,7 @@ uv run python benchmark/benchmark_request_to_sql.py
 
 The app works with two LLMs: one _heavy llm_ for the SQL generation and one _light llm_ for easy tasks like NER and retrieval.
 
-The interaction with the LLM (model and API provider) is configured using environment variables. By default the light LLM is set to use `qwen2.5:7b` with `ollama` and the heavy LLM is set to use `llama-3.3-70b-instruct` with open router. You can leave as is and just need to provide your `OpenRouter` API key in environment variable (see below). But you can also use any other model and API provider compliant with OpenAI SDK. Here is the list of environment variables you can set:
+The interaction with the LLM (model and API provider) is configured using environment variables. By default the light LLM is set to use `qwen2.5:7b` with `ollama` and the heavy LLM is set to use `llama-3.3-70b-instruct` with `OpenRouter`. You can leave as is and just need to provide your `OpenRouter` API key in environment variable (see below). But you can also use any other model and API provider compliant with OpenAI SDK. Here is the list of environment variables you can set:
 
 | Environment Variable | Description | Default Value |
 |---------------------|-------------|---------------|
