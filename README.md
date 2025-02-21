@@ -6,7 +6,7 @@ TODO
 
 Run:
 ```sh
-uv run python -m streamlit run app/app.py
+uv run python -m streamlit run app/insights_app.py
 ```
 
 
@@ -31,3 +31,7 @@ Will benchmark a list of chosen models, and save the result in `data/benchmark/r
 # Improvements
 
 - Handle OPENROUTER_API_KEY through .env file in the benchmark scripts
+- Add retry mechanism on llm calls
+- Handle TODO tags
+- Test other models for request_to_sql
+- Try autoencoders like BERT for ner_retrieval_pipeline
