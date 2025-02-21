@@ -200,7 +200,7 @@ if __name__ == "__main__":
 
     # Retrieve benchmark test cases
     with INPUT_BENCHMARK_PATH.open("r", encoding="utf-8") as f:
-        benchmark_test_cases = [TestCase(**e) for e in json.load(f)][:2]
+        benchmark_test_cases = [TestCase(**e) for e in json.load(f)]
 
     llm_models_results = {}
     for llm_model in LLM_MODELS:
