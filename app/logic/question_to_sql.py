@@ -3,6 +3,7 @@
 # Imports
 
 from app.db.dao import get_table_columns, get_tables
+from app.llm import query_llm
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Models
@@ -25,3 +26,48 @@ def get_db_description() -> str:
     tables_names = get_tables()
     tables_desc = {table: get_table_description(table) for table in tables_names}
     return "\n\n".join(tables_desc.values())
+
+
+def build_prompt(question: str, db_description: str) -> str:
+    """Build prompt to retrieve SQL query from LLM."""
+    return f"""
+    You are an expert in SQL and NBA data.
+    A user asks you this question:
+
+    {question}
+
+
+    Generate a valid SQL query which will answer his question.
+    Only retrieve the SQL query an nothing else.
+    Whenever relevant, prefer to use CTE and window functions instead of sub queries.
+
+    Example of expected return:
+    ```sql
+    select t.column1, t.column2
+    from table t
+    where t.column3 = 'value'
+    ```
+
+    To answer, you have access to a PostgreSQL database with the following tables:
+    {db_description}
+    """
+
+
+def extract_sql_query(text: str) -> str:
+    """Extract SQL query from a text. This assumes that the SQL query is enclosed in triple backticks."""
+    """Extract SQL query from LLM response."""
+    sql_identifier = "```sql"
+    if sql_identifier not in text:
+        error_msg = "No SQL query found in text."
+        raise ValueError(error_msg)
+    start_index = text.find(sql_identifier)
+    return text[start_index + len(sql_identifier) :].split("```")[0]
+
+
+def generate_sql_query(question: str) -> str:
+    """Generate SQL query from a question."""
+    db_description = get_db_description()
+    prompt = build_prompt(question, db_description)
+    llm_response = query_llm(prompt=prompt, model_kind="heavy")
+    sql_query = extract_sql_query(llm_response)
+    return sql_query
