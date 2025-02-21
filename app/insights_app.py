@@ -5,6 +5,11 @@
 
 import streamlit as st
 
+from app.db.connection import con
+
+# -------------------------------------------------------------------------------------------------------------------- #
+# Layout
+
 input_question = st.text_area(
     "Insights question",
     value="",
@@ -12,6 +17,8 @@ input_question = st.text_area(
 )
 
 input_trigger = st.button("Get an answer")
+
+st.write(con.sql("select 1+1;"))
 
 if input_trigger:
     st.write("TODO")
