@@ -5,7 +5,9 @@
 
 import streamlit as st
 
-from app.db import dao
+from app.db.dao import sql_to_df
+from app.logic.ner_retrieval import replace_names_in_text
+from app.logic.question_to_sql import generate_sql_query
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Layout
@@ -18,9 +20,11 @@ input_question = st.text_area(
 
 input_trigger = st.button("Get an answer")
 
-st.write(dao.get_player_names()[:5])
-st.write(dao.get_team_names()[:5])
-
-
 if input_trigger:
-    st.write("TODO")
+    clean_question = replace_names_in_text(input_question)
+    sql_query = generate_sql_query(clean_question)
+    sql_query_result = sql_to_df(sql_query)
+
+    st.write(clean_question)
+    st.write(sql_query)
+    st.dataframe(sql_query_result)
