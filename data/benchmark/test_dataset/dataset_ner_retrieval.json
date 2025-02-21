@@ -1,0 +1,124 @@
+[
+    {
+        "request": "The Celtics are playing against the Lakers. Pierce is playing for the Celtics and Kobe Bryant is playing for the Lakers.",
+        "expected_raw_teams": [
+            "Celtics",
+            "Lakers"
+        ],
+        "expected_raw_players": [
+            "Pierce",
+            "Kobe Bryant"
+        ],
+        "expected_db_teams": {
+            "Celtics": "Boston Celtics",
+            "Lakers": "Los Angeles Lakers"
+        },
+        "expected_db_players": {
+            "Pierce": "Paul Pierce",
+            "Kobe Bryant": "Kobe Bryant"
+        }
+    },
+    {
+        "request": "How many points did Rondo scored when he played for the mavericks ?",
+        "expected_raw_teams": [
+            "mavericks"
+        ],
+        "expected_raw_players": [
+            "Rondo"
+        ],
+        "expected_db_teams": {
+            "mavericks": "Dallas Mavericks"
+        },
+        "expected_db_players": {
+            "Rondo": "Rajon Rondo"
+        }
+    },
+    {
+        "request": "What is maximum number of points scored by a player in a single game between 2000 and 2020 ?",
+        "expected_raw_teams": [],
+        "expected_raw_players": [],
+        "expected_db_teams": {},
+        "expected_db_players": {}
+    },
+    {
+        "request": "How many games did the miami heat win in 2020 ?",
+        "expected_raw_teams": [
+            "miami heat"
+        ],
+        "expected_raw_players": [],
+        "expected_db_teams": {
+            "miami heat": "Miami Heat"
+        },
+        "expected_db_players": {}
+    },
+    {
+        "request": "Who scored the most points between carmelo anthony and lebron james during their first season?",
+        "expected_raw_teams": [],
+        "expected_raw_players": [
+            "lebron james",
+            "carmelo anthony"
+        ],
+        "expected_db_teams": {},
+        "expected_db_players": {
+            "lebron james": "LeBron James",
+            "carmelo anthony": "Carmelo Anthony"
+        }
+    },
+    {
+        "request": "How many rebounds did dwight howard average when he played for the magic?",
+        "expected_raw_teams": [
+            "magic"
+        ],
+        "expected_raw_players": [
+            "dwight howard"
+        ],
+        "expected_db_teams": {
+            "magic": "Orlando Magic"
+        },
+        "expected_db_players": {
+            "dwight howard": "Dwight Howard"
+        }
+    },
+    {
+        "request": "What was the highest scoring game in the 2019-2020 season?",
+        "expected_raw_teams": [],
+        "expected_raw_players": [],
+        "expected_db_teams": {},
+        "expected_db_players": {}
+    },
+    {
+        "request": "How many assists did chris paul have in the 2018 playoffs?",
+        "expected_raw_teams": [],
+        "expected_raw_players": [
+            "chris paul"
+        ],
+        "expected_db_teams": {},
+        "expected_db_players": {
+            "chris paul": "Chris Paul"
+        }
+    },
+    {
+        "request": "Which team had the best record in the Eastern Conference in 2021?",
+        "expected_raw_teams": [],
+        "expected_raw_players": [],
+        "expected_db_teams": {},
+        "expected_db_players": {}
+    },
+    {
+        "request": "Who had more steals between westbrook and kevin durant when they played for oklahoma city?",
+        "expected_raw_teams": [
+            "oklahoma city"
+        ],
+        "expected_raw_players": [
+            "westbrook",
+            "kevin durant"
+        ],
+        "expected_db_teams": {
+            "oklahoma city": "Oklahoma City Thunder"
+        },
+        "expected_db_players": {
+            "westbrook": "Russell Westbrook",
+            "kevin durant": "Kevin Durant"
+        }
+    }
+]

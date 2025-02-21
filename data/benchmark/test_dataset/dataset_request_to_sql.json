@@ -1,0 +1,115 @@
+[
+    {
+        "question":"Which player_id played the highest number of games in total ? Retrieve only the player_id.",
+        "num_tables_involved":1.0,
+        "sql_query":"select player_id from game_boxscore group by player_id order by count(*) desc limit 1",
+        "expected_result":[{"player_id":"5d840cd3c34bddb0032e549468dc93944709b9c35bf4669db3628e29e7f8ef3c"}]
+    },
+
+    {
+        "question":"Which player_id scored the highest number of points in a game? Retrieve the player id and the number of points scored.",
+        "num_tables_involved":1.0,
+        "sql_query":"select player_id from game_boxscore order by points desc limit 1\n",
+        "expected_result":[{"player_id": "172f44a95b6cb6f06d77fd7ccf9a254065b1416d3a82e2fb74ea465089600fb6", "points": 81}]
+    },
+
+    {
+        "question":"What is highest number of points scored in a single game by a team ? Retrieve only the number named max_score.",
+        "num_tables_involved":1.0,
+        "sql_query":"select max(greatest(home_team_points, away_team_points)) max_score from game_summary",
+        "expected_result":[{"max_score":176}]
+    },
+
+    {
+        "question":"What is highest number of blocks made by a player in a single game ? Return only the number named max_blocks.",
+        "num_tables_involved":1.0,
+        "sql_query":"select max(blocks) max_blocks from game_boxscore",
+        "expected_result":[{"max_blocks":12}]
+    },
+
+    {
+        "question":"What is the highest winning percentage by a team in a season (precision to 0.2%)? Return the result in percentage, scaled between 0 and 100 and name it max_pct_game_win.",
+        "num_tables_involved":1.0,
+        "sql_query":"select round(100 * max(pct_game_win), 2) from team_season",
+        "expected_result":[{"max_pct_game_win":89.02}]
+    },
+
+    {
+        "question":"What is the difference between the average number of games scored by a home team and an away team (Rounded to 0,1). Return only the number, named avg_diff.",
+        "num_tables_involved":1.0,
+        "sql_query":"select round(avg(home_team_points - away_team_points), 1) from game_summary",
+        "expected_result":[{"avg_diff":2.9}]
+    },
+
+    {
+        "question":"What is the average cumulated number of points (Rounded to 0,1) scored in a game depending if it is during regular season or not. Return the columns is_regular_season and avg_points, ordered by is_regular_season.",
+        "num_tables_involved":1,
+        "sql_query":"select is_regular_season, avg(home_team_points + away_team_points) from game_summary group by is_regular_season order by is_regular_season",
+        "expected_result":[{"is_regular_season": false, "avg_points": 197.8}, {"is_regular_season": true, "avg_points": 203.8}]
+
+    },
+
+    {
+        "question":"What is the highest number of points scored in a single game by LeBron James ? Return only the the number, named max_pts",
+        "num_tables_involved":2.0,
+        "sql_query":"select max(points) from player inner join game_boxscore on player.id = game_boxscore.player_id where player.player_name like 'LeBron James' limit 10",
+        "expected_result":[{"max_pts":61}]
+    },
+
+    {
+        "question":"Which player scored the highest number of points in a single game ? Return the player name as player_name, and the number of points as nb_points.",
+        "num_tables_involved":2.0,
+        "sql_query":"select player.player_name from player inner join game_boxscore on player.id = game_boxscore.player_id order by points desc limit 1",
+        "expected_result":[{"player_name": "Kobe Bryant", "nb_points": 81}]
+    },
+
+    {
+        "question":"Which team scored the highest number of points in a single game while being the home team ? Return only the team name as team_name",
+        "num_tables_involved":2.0,
+        "sql_query":"select team.team_name from game_summary inner join team on team.id = game_summary.home_team_id order by game_summary.home_team_points desc LIMIT 1",
+        "expected_result":[{"team_name":"Los Angeles Clippers"}]
+    },
+
+    {
+        "question":"Which player scored the highest number of blocks in a single game ? If there is several players, return them all. Return the columns player_name and max_nb_blocks. Sort by player name.",
+        "num_tables_involved":2.0,
+        "sql_query":"SELECT p.player_name, gbs.blocks AS max_nb_blocks FROM game_boxscore gbs JOIN player p ON gbs.player_id = p.id WHERE gbs.blocks = (SELECT MAX(blocks) FROM game_boxscore) sort by p.player_name;",
+        "expected_result":[{"player_name": "Hassan Whiteside", "max_nb_blocks": 12}, {"player_name": "JaVale McGee", "max_nb_blocks": 12}, {"player_name": "Keon Clark", "max_nb_blocks": 12}]
+    },
+
+    {
+        "question":"How many games per season did LeBron James played in average between 2005 and 2015 included ? Return the column avg_nb_games rounded to 0,1.",
+        "num_tables_involved":"TODO",
+        "sql_query":"SELECT ROUND(AVG(ps.nb_games), 1) AS avg_nb_games FROM player_season ps JOIN player p ON ps.player_id = p.id JOIN season s ON ps.season_id = s.id WHERE p.player_name = 'LeBron James' AND s.start_year BETWEEN 2005 AND 2015;",
+        "expected_result":[{"avg_nb_games": 75.3}]
+    },
+
+    {
+        "question":"What is the average number of three point attempts per player per game for every years between 2005 and 2007 included ? Return the column season_years and avg_nb_3pt_attempts rounded to 0,1.",
+        "num_tables_involved":3,
+        "sql_query":"SELECT s.years AS season_years, ROUND(AVG(gbs.three_pts_attempts), 1) AS avg_nb_3pt_attempts FROM  game_boxscore gbs JOIN  game_summary gs ON gbs.game_id = gs.id JOIN  season s ON gs.season_id = s.id WHERE  s.start_year BETWEEN 2005 AND 2007 GROUP BY  s.years ORDER BY  s.years;",
+        "expected_result":[{"season_years": "2005-2006", "avg_nb_3pt_attempts": 1.6}, {"season_years": "2006-2007", "avg_nb_3pt_attempts": 1.7}, {"season_years": "2007-2008", "avg_nb_3pt_attempts": 1.8}]
+    },
+
+    {
+        "question":"What is the average number of three point attempts for the entire team per game, for every years between 2010 and 2015 included ? Return the column season_start_year and avg_nb_3pt_attempts rounded to 0,1.",
+        "num_tables_involved":3,
+        "sql_query":"SELECT s.years AS season_years, ROUND(AVG(gbs.three_pts_attempts), 1) AS avg_nb_3pt_attempts FROM  game_boxscore gbs JOIN  game_summary gs ON gbs.game_id = gs.id JOIN  season s ON gs.season_id = s.id WHERE  s.start_year BETWEEN 2005 AND 2007 GROUP BY  s.years ORDER BY  s.years;",
+        "expected_result": [{"start_year": 2010, "avg_nb_3pt_attempts": 18.0}, {"start_year": 2011, "avg_nb_3pt_attempts": 18.3}, {"start_year": 2012, "avg_nb_3pt_attempts": 20.0}, {"start_year": 2013, "avg_nb_3pt_attempts": 21.6}, {"start_year": 2014, "avg_nb_3pt_attempts": 22.6}, {"start_year": 2015, "avg_nb_3pt_attempts": 24.2}]
+    },
+
+    {
+        "question":"Which player scored the most number of points in average per season for each year between 2005 and 2007 ? Return the column season_start_year, player_name and avg_points (rounded to 0,2), order by season_start_year.",
+        "num_tables_involved":"TODO",
+        "sql_query":"WITH player_rank AS ( SELECT p.player_name, round(ps.avg_points, 1) avg_points, s.start_year, ROW_NUMBER() over (partition by s.start_year order by ps.avg_points desc ) scoring_rank  FROM player_season ps JOIN player p ON ps.player_id = p.id JOIN season s ON ps.season_id = s.id WHERE s.start_year BETWEEN 2005 AND 2007 )  SELECT player_rank.player_name, player_rank.avg_points, player_rank.start_year, FROM player_rank WHERE player_rank.scoring_rank = 1 ORDER BY player_rank.start_year",
+        "expected_result": [{"season_start_year": 2005, "player_name": "Kobe Bryant", "avg_points": 35.4}, {"season_start_year": 2006, "player_name": "Kobe Bryant", "avg_points": 31.56}, {"season_start_year": 2007, "player_name": "LeBron James", "avg_points": 30.0}]
+    },
+
+    {
+        "question":"Retrieve the top 5 teams of the season starting in 2022 by winning percentage. Return only the column team_name",
+        "num_tables_involved":"TODO",
+        "sql_query":"SELECT t.team_name FROM team t JOIN team_season ts ON t.id = ts.team_id JOIN season s ON ts.season_id = s.id WHERE s.start_year= 2022 ORDER BY pct_game_win DESC LIMIT 5;",
+        "expected_result": [{"team_name": "Milwaukee Bucks"}, {"team_name": "Boston Celtics"}, {"team_name": "Philadelphia 76ers"}, {"team_name": "Denver Nuggets"}, {"team_name": "Memphis Grizzlies"}]
+    }
+
+]
