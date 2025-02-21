@@ -4,13 +4,14 @@
 - [1. Project description](#1-project-description)
 - [2. Prerequisites](#2-prerequisites)
 - [3. Quickstart](#3-quickstart)
-  - [3.1 ⚙️ Set up](#31-️-set-up)
+  - [3.1 Set up](#31-set-up)
   - [3.2 Run](#32-run)
-  - [3.3.  Environment variables](#33--environment-variables)
+  - [3.3. Environment variables](#33-environment-variables)
 - [5. Dataset](#5-dataset)
 - [6. Benchmarks](#6-benchmarks)
 - [7 Code Quality and Formatting](#7-code-quality-and-formatting)
-- [8. Complementary documentation](#8-complementary-documentation)
+- [8. Improvements](#8-improvements)
+- [9. Complementary documentation](#9-complementary-documentation)
 
 
 # 1. Project description
@@ -34,7 +35,7 @@ The project uses:
 # 3. Quickstart
 
 
-## 3.1 ⚙️ Set up
+## 3.1 Set up
 
 1. Install uv (v0.5.10):
    1. For macOS / Linux `curl -LsSf https://astral.sh/uv/0.5.10/install.sh | sh`
@@ -65,7 +66,7 @@ uv run python benchmark/benchmark_request_to_sql.py
 ```
 
 
-## 3.3.  Environment variables
+## 3.3. Environment variables
 
 
 The app works with two LLMs: one _heavy llm_ for the SQL generation and one _light llm_ for easy tasks like NER and retrieval.
@@ -76,7 +77,7 @@ The interaction with the LLM (model and API provider) is configured using enviro
 |---------------------|-------------|---------------|
 | `LIGHT_LLM_BASE_URL` | Base URL of the light LLM API.\* | `http://localhost:11434/v1` |
 | `LIGHT_LLM_API_KEY` | API key to connect to the light LLM API.\* | `ollama` |
-| `LIGHT_LLM_MODEL` | Name of light LLM model used.\* | `qwen2.5:7b` |
+| `LIGHT_LLM_MODEL` | Name of light LLM model used. Must be compatible with _structured_output_.\* | `qwen2.5:7b` |
 | `HEAVY_LLM_BASE_URL` | Base URL of the heavy LLM API.\* | `https://openrouter.ai/api/v1` |
 | `HEAVY_LLM_API_KEY` | API key to connect to the heavy LLM API.\* | *(Required)* |
 | `HEAVY_LLM_MODEL` | Name of heavy LLM model used.\* | `meta-llama/llama-3.3-70b-instruct:free` |
@@ -128,7 +129,17 @@ _TODO: Add results with deepseek V3 and reasoning models._
 - A CI/CD pipeline is implemented with github actions to lint the code
 
 
-# 8. Complementary documentation
+# 8. Improvements
+
+- Handle `OPENROUTER_API_KEY` through .env file in the benchmark scripts
+- Handle TODO tags
+- Add retry mechanism on llm calls (when retrieve null value or incorrect SQL query)
+- Test other models for request_to_sql
+- Try autoencoders like BERT for ner_retrieval_pipeline
+- Display plot based on generated result
+
+
+# 9. Complementary documentation
 
 - [Ollama](https://ollama.com/): To interact with the LLMs
 - [OpenRouter](https://openrouter.ai/): To interact with the LLMs
