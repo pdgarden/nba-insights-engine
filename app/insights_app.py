@@ -5,7 +5,7 @@
 
 import streamlit as st
 
-from app.db.connection import con
+from app.db import dao
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Layout
@@ -18,7 +18,9 @@ input_question = st.text_area(
 
 input_trigger = st.button("Get an answer")
 
-st.write(con.sql("select 1+1;"))
+st.write(dao.get_player_names()[:5])
+st.write(dao.get_team_names()[:5])
+
 
 if input_trigger:
     st.write("TODO")
