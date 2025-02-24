@@ -37,8 +37,7 @@ def build_prompt(question: str, db_description: str) -> str:
 
 
     Generate a valid SQL query which will answer his question.
-    Only retrieve the SQL query an nothing else.
-    Whenever relevant, prefer to use CTE and window functions instead of sub queries.
+    Be concise. Only retrieve the SQL query an nothing else.
 
     Example of expected return:
     ```sql

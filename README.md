@@ -104,22 +104,27 @@ For each benchmark, a small test set was created and a bunch of models were test
 
 **Name entity recognition and retrieval pipeline results:**
 
-| Model | Accuracy  |
+| Model* | Accuracy  |
 |-------|---------- |
 | smollm2:360m | 0% |
 | llama3.2:3b | 90% |
 | mistral:7b | 60%  |
 | qwen2.5:7b | 100% |
 
+\* _Model name from ollama_
+
+
 
 **SQL generation pipeline results:**
 
-| Model                                          | Accuracy  |
+| Model**                                        | Accuracy  |
 |----------------------------------------------- |---------- |
+| mistralai/mistral-small-24b-instruct-2501:free | 50.0%     |
+| nvidia/llama-3.1-nemotron-70b-instruct:free    | 75.0%     |
 | meta-llama/llama-3.3-70b-instruct:free         | 81.25%    |
-| mistralai/mistral-small-24b-instruct-2501:free | 56.25%    |
+| deepseek/deepseek-chat:free                    | 68.75%    |
 
-_TODO: Add results with deepseek V3 and reasoning models._
+** _Model name from OpenRouter._
 
 # 7 Code Quality and Formatting
 

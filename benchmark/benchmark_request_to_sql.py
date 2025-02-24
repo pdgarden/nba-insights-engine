@@ -63,7 +63,12 @@ LLM_CLIENT = OpenAI(
 INPUT_BENCHMARK_PATH = DATA_FOLDER / "benchmark" / "test_dataset" / "dataset_request_to_sql.json"
 OUTPUT_BENCHMARK_PATH = DATA_FOLDER / "benchmark" / "results" / "dataset_request_to_sql_results.json"
 
-LLM_MODELS = ["meta-llama/llama-3.3-70b-instruct:free", "mistralai/mistral-small-24b-instruct-2501:free"]
+LLM_MODELS = [
+    "mistralai/mistral-small-24b-instruct-2501:free",
+    "nvidia/llama-3.1-nemotron-70b-instruct:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "deepseek/deepseek-chat:free",
+]
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Functions
@@ -147,8 +152,7 @@ def build_prompt(nba_data_query: str, db_description: str) -> str:
 
 
     Generate a valid SQL query which will answer his question.
-    Only retrieve the SQL query an nothing else.
-    Whenever relevant, prefer to use CTE and window functions instead of sub queries.
+    Be concise. Only retrieve the SQL query an nothing else.
 
     Example of expected return:
     ```sql
