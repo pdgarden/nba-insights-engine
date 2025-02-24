@@ -2,11 +2,10 @@
 # -------------------------------------------------------------------------------------------------------------------- #
 # Imports
 
+from loguru import logger
+
 from app.db.dao import get_table_columns, get_tables
 from app.llm import query_llm
-
-# -------------------------------------------------------------------------------------------------------------------- #
-# Models
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Functions
@@ -55,7 +54,6 @@ def build_prompt(question: str, db_description: str) -> str:
 
 def extract_sql_query(text: str) -> str:
     """Extract SQL query from a text. This assumes that the SQL query is enclosed in triple backticks."""
-    """Extract SQL query from LLM response."""
     sql_identifier = "```sql"
     if sql_identifier not in text:
         error_msg = "No SQL query found in text."
@@ -69,5 +67,6 @@ def generate_sql_query(question: str) -> str:
     db_description = get_db_description()
     prompt = build_prompt(question, db_description)
     llm_response = query_llm(prompt=prompt, model_kind="heavy")
+    logger.debug(f"llm_response: {llm_response}")
     sql_query = extract_sql_query(llm_response)
     return sql_query
