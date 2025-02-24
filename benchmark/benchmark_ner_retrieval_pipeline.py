@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 import duckdb
+from loguru import logger
 from openai import OpenAI
 from pydantic import BaseModel, computed_field
 
@@ -199,7 +200,7 @@ if __name__ == "__main__":
 
     llm_models_results = {}
     for llm_model in LLM_MODELS:
-        print(f"Test: {llm_model}")
+        logger.info(f"Test: {llm_model}")
 
         benchmark_result = BenchmarkTestResults(
             llm_model=llm_model,
@@ -208,8 +209,8 @@ if __name__ == "__main__":
             ],
         )
         llm_models_results[llm_model] = benchmark_result
-        print(f"    Accuracy: {benchmark_result.accuracy:.1%}")
+        logger.info(f"    Accuracy: {benchmark_result.accuracy:.1%}")
 
     with OUTPUT_BENCHMARK_PATH.open("w") as f:
         json.dump([llm_model_result.model_dump() for llm_model_result in llm_models_results.values()], f, indent=4)
-    print("Done")
+    logger.info("Done")

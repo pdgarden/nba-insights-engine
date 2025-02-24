@@ -9,7 +9,11 @@ dependencies = [
     "numpy>=2.2.3",
     "openai>=1.63.2",
     "pandas>=2.2.3",
+    "pydantic-settings>=2.8.0",
     "pydantic>=2.10.6",
+    "streamlit>=1.42.2",
+    "tabulate>=0.9.0",
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]
@@ -29,4 +33,4 @@ extend-select = [
     'TRY', 'FLY', 'NPY', 'PLC', 'PLE', 'PLW', 'I',
     ]
 
-ignore = ['S608']
+ignore = ['S608', 'ANN401']

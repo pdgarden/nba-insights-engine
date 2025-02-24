@@ -1,8 +1,8 @@
 [
     {
-        "question":"Which player_id played the highest number of games in total ? Retrieve only the player_id.",
+        "question":"Which player_id played the highest number of games with at least 20 points in the game ? Retrieve only the player_id.",
         "num_tables_involved":1.0,
-        "sql_query":"select player_id from game_boxscore group by player_id order by count(*) desc limit 1",
+        "sql_query":"select player_id from game_boxscore where points >= 20 group by player_id order by count(*) desc limit 1",
         "expected_result":[{"player_id":"5d840cd3c34bddb0032e549468dc93944709b9c35bf4669db3628e29e7f8ef3c"}]
     },
 
@@ -14,7 +14,7 @@
     },
 
     {
-        "question":"What is highest number of points scored in a single game by a team ? Retrieve only the number named max_score.",
+        "question":"What is highest number of points scored in a single game by a team, eitheir playing at home or away ? Retrieve only the number named max_score.",
         "num_tables_involved":1.0,
         "sql_query":"select max(greatest(home_team_points, away_team_points)) max_score from game_summary",
         "expected_result":[{"max_score":176}]
