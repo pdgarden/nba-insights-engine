@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 import duckdb
+from loguru import logger
 from openai import OpenAI
 from pydantic import BaseModel, computed_field
 
@@ -80,9 +81,9 @@ def retry_on_null(nb_retry: int, delay: int = 1) -> Callable:
                 if result not in (None, ""):
                     return result
                 attempts += 1
-                print(f"Function: {func.__name__} retrieved None. Retrying ({attempts}/{nb_retry})...")
+                logger.error(f"Function: {func.__name__} retrieved None. Retrying ({attempts}/{nb_retry})...")
                 time.sleep(delay)
-            print(f"Function: {func.__name__} still retrieved None after {nb_retry} attempts. Returning None.")
+            logger.error(f"Function: {func.__name__} still retrieved None after {nb_retry} attempts. Returning None.")
             return None  # If all attempts fail, return None
 
         return wrapper
@@ -179,7 +180,7 @@ def test_single_case(test_case: TestCase, llm_model: str, db_description: str) -
             computed_sql_query=sql_query,
         )
     except Exception as exc:
-        print(f"Error: {exc}")
+        logger.error(f"Error: {exc}")
         result = TestCaseResult(
             question=test_case.question,
             expected_result=test_case.expected_result,
@@ -204,7 +205,7 @@ if __name__ == "__main__":
 
     llm_models_results = {}
     for llm_model in LLM_MODELS:
-        print(f"Test: {llm_model}")
+        logger.info(f"Test: {llm_model}")
 
         # Test each test case for a given LLM
         test_cases_results = []
@@ -219,8 +220,8 @@ if __name__ == "__main__":
             test_cases_results=test_cases_results,
         )
         llm_models_results[llm_model] = benchmark_results
-        print(f"    Accuracy: {benchmark_results.accuracy:.1%}")
+        logger.info(f"    Accuracy: {benchmark_results.accuracy:.1%}")
 
     with OUTPUT_BENCHMARK_PATH.open("w") as f:
         json.dump([llm_model_result.model_dump() for llm_model_result in llm_models_results.values()], f, indent=4)
-    print("Done")
+    logger.info("Done")
