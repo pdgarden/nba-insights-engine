@@ -91,7 +91,7 @@ To override the default values, you can set these environment variables directly
 # 5. Dataset
 
 The NBA database used is a duckdb database, generated using duckdb and dbt with this [repo](https://github.com/pdgarden/nba-stats).
-
+The current database contains data ranging from 1999 to 2024. This time span will be extended with future updates.
 
 # 6. Benchmarks
 
@@ -136,12 +136,20 @@ For each benchmark, a small test set was created and a bunch of models were test
 
 # 8. Improvements
 
+- Move duckdb database to cloud (e.g. motherduck)
+- Increase dataset's timeframe (Right now from 1999 to 2024)
 - Handle `OPENROUTER_API_KEY` through .env file in the benchmark scripts
 - Handle TODO tags
 - Add retry mechanism on llm calls (when retrieve null value or incorrect SQL query)
-- Test other models for request_to_sql
 - Try autoencoders like BERT for ner_retrieval_pipeline
 - Display plot based on generated result
+- Better error handling
+- Improve test to sql benchmark: add more queries and tag the queries with the difficulty level
+- Improve text to SQL results:
+  - Test agent to generate sql requests
+  - Test intermediate step to generate sql request by filtering the columns / tables to use
+  - Test other models
+  - Tet other prompts
 
 
 # 9. Complementary documentation
