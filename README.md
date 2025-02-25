@@ -95,7 +95,7 @@ Here is a brief overview of the system:
 ![Alt Text](assets/images/app_pipeline.png)
 
 
-For the Named Entity Recognition tasks, the system uses a LLM, but I am currently working on a fine-tuned auto-encoder model to replace it.
+For the Named Entity Recognition (NER) task, the system uses a LLM, but I am currently working on a fine-tuned auto-encoder model to replace it.
 
 # 5. Dataset
 
