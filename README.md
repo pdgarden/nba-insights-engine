@@ -7,7 +7,7 @@
   - [3.1 Set up](#31-set-up)
   - [3.2 Run](#32-run)
   - [3.3. Environment variables](#33-environment-variables)
-- [4. System](#4-system)
+- [4. Workflow](#4-workflow)
 - [5. Dataset](#5-dataset)
 - [6. Benchmarks](#6-benchmarks)
 - [7 Code Quality and Formatting](#7-code-quality-and-formatting)
@@ -25,8 +25,7 @@ Example of questions:
 - What are the top 5 players with the most points per games in the 2022-2023 season?
 
 
-![Alt Text](assets/gif/app_example.gif)
-
+<img src="assets/gif/app_example.gif" alt="App demo" style="border: 1px solid grey; border-radius: 8px;">
 
 # 2. Prerequisites
 
@@ -90,11 +89,11 @@ _\* Used through OpenAI SDK._
 
 To override the default values, you can set these environment variables directly in your environment, or in a `.env` file or at the repo's root. See .example in `env.example`
 
-# 4. System
+# 4. Workflow
 
 Here is a brief overview of the system:
 
-![Alt Text](assets/images/app_pipeline.png)
+<img src="assets/images/app_pipeline.png" alt="App workflow" style="border: 1px solid grey; border-radius: 8px;">
 
 
 For the Named Entity Recognition (NER) task, the system uses a LLM, but I am currently working on a fine-tuned auto-encoder model to replace it.
