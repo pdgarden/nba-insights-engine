@@ -25,6 +25,8 @@ Example of questions:
 - What are the top 5 players with the most points per games in the 2022-2023 season?
 
 
+![Alt Text](assets/gif/app_example.gif)
+
 
 # 2. Prerequisites
 
