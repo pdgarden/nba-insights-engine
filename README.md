@@ -24,8 +24,10 @@ Example of questions:
 - What is the highest number of points scored by lebron james in a single game?
 - What are the top 5 players with the most points per games in the 2022-2023 season?
 
-
+---
 <img src="assets/gif/app_example.gif" alt="App demo" style="border: 1px solid grey; border-radius: 8px;">
+
+---
 
 # 2. Prerequisites
 
