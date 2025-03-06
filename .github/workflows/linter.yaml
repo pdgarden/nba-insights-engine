@@ -33,3 +33,5 @@ jobs:
 
       - name: Run pytest
         run: uv run python -m pytest -v .
+        env:
+          HEAVY_LLM_MODEL: ${{ vars.HEAVY_LLM_MODEL }}
