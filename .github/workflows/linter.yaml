@@ -9,3 +9,27 @@ jobs:
       - uses: chartboost/ruff-action@v1
         with:
           version: 0.9.7
+
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.5.10"
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Run pytest
+        run: uv run python -m pytest -v .
