@@ -19,6 +19,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pre-commit>=4.1.0",
+    "pytest>=8.3.5",
     "ruff>=0.9.7",
 ]
 
@@ -32,5 +33,7 @@ extend-select = [
     'E', 'F', 'W', 'C90', 'A', 'ANN', 'S', 'B', 'PT', 'Q', 'RSE', 'SIM', 'ARG', 'PTH', 'PD',
     'TRY', 'FLY', 'NPY', 'PLC', 'PLE', 'PLW', 'I',
     ]
-
 ignore = ['S608', 'ANN401']
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**/*.py" = ["S101"]
