@@ -6,7 +6,7 @@ import difflib
 
 from pydantic import BaseModel
 
-from app.db.dao import get_player_names, get_team_names
+from app.db.dao import get_players_names, get_teams_names
 from app.llm import query_llm
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -48,28 +48,27 @@ Here is the text to process:
 """
 
 
-def get_closest_player_name(player_name: str) -> str:
+def get_closest_player_name(player_name: str, players_names: list[str]) -> str:
     """Find the closest player name in the database from an input given name."""
-    player_names = get_player_names()
-    player_names_lowercase_to_original_case = {p.lower(): p for p in player_names}
+    players_names_lowercase_to_original_case = {p.lower(): p for p in players_names}
 
     # Find the closest match, use lowercase to make the search case insensitive.
     closest_match_lower_case = difflib.get_close_matches(
-        word=player_name.lower(), possibilities=[p.lower() for p in player_names], n=1, cutoff=0
+        word=player_name.lower(), possibilities=[p.lower() for p in players_names], n=1, cutoff=0
     )[0]
-    return player_names_lowercase_to_original_case[closest_match_lower_case]
+    return players_names_lowercase_to_original_case[closest_match_lower_case]
 
 
-def get_closest_team_name(team_name: str) -> str:
+def get_closest_team_name(team_name: str, teams_names: list[str]) -> str:
     """Find the closest team name in the database from an input given name."""
-    team_names = get_team_names()
-    team_names_lowercase_to_original_case = {p.lower(): p for p in team_names}
+    teams_names = get_teams_names()
+    teams_name_lowercase_to_original_cases = {p.lower(): p for p in teams_names}
 
     # Find the closest match, use lowercase to make the search case insensitive.
     closest_match_lower_case = difflib.get_close_matches(
-        word=team_name.lower(), possibilities=[p.lower() for p in team_names], n=1, cutoff=0
+        word=team_name.lower(), possibilities=[p.lower() for p in teams_names], n=1, cutoff=0
     )[0]
-    return team_names_lowercase_to_original_case[closest_match_lower_case]
+    return teams_name_lowercase_to_original_cases[closest_match_lower_case]
 
 
 def replace_names_in_text(text: str) -> str:
@@ -86,9 +85,17 @@ def replace_names_in_text(text: str) -> str:
         teams=[q[q.lower().find(p.lower()) : q.lower().find(p.lower()) + len(p)] for p in ner_players_teams.teams],
     )
 
+    # Replace the names in the text with the ones available in the db.
     for player_name in ner_result.players:
-        text = text.replace(player_name, get_closest_player_name(player_name))
+        text = text.replace(
+            player_name,
+            get_closest_player_name(player_name=player_name, players_names=get_players_names()),
+        )
+
     for team_name in ner_result.teams:
-        text = text.replace(team_name, get_closest_team_name(team_name))
+        text = text.replace(
+            team_name,
+            get_closest_team_name(team_name=team_name, teams_names=get_teams_names()),
+        )
 
     return text
