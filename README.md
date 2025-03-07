@@ -1,8 +1,11 @@
-[![Actions status](https://github.com/pdgarden/nba-insights-engine/actions/workflows/ci.yaml/badge.svg)](https://github.com/pdgarden/nba-insights-engine/actions)
-
 # NBA insights engine
 
-- [NBA insights engine](#nba-insights-engine)
+[![Actions status](https://github.com/pdgarden/nba-insights-engine/actions/workflows/ci.yaml/badge.svg)](https://github.com/pdgarden/nba-insights-engine/actions)
+<img src="https://img.shields.io/badge/python-3.12-blue" alt="Supported Python version">
+<img src="https://img.shields.io/static/v1?logo=uv&label=uv&message=0.5.10&color=blue">
+
+
+
 - [1. Project description](#1-project-description)
 - [2. Prerequisites](#2-prerequisites)
 - [3. Quickstart](#3-quickstart)
