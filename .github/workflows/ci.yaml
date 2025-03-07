@@ -1,4 +1,4 @@
-name: Linter - Ruff
+name: CI - Linter / Unit Tests
 on: [ push ]
 
 jobs:
