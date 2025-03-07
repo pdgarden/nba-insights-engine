@@ -1,4 +1,4 @@
-name: CI - Linter / Unit Tests
+name: CI # Linter / Unit Tests
 on: [ push ]
 
 jobs:

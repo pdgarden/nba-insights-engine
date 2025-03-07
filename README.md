@@ -1,3 +1,5 @@
+[![Actions status](https://github.com/pdgarden/nba-insights-engine/actions/workflows/ci.yaml/badge.svg)](https://github.com/pdgarden/nba-insights-engine/actions)
+
 # NBA insights engine
 
 - [NBA insights engine](#nba-insights-engine)
