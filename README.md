@@ -55,8 +55,6 @@ The project uses:
    1. Setup pre-commit: `uv run pre-commit install -t commit-msg -t pre-commit`
 
 
-The lock file only contains dependencies necessary to run the Streamlit app.
-
 ## 3.2 Run
 
 Once the set up is done, the app can be launched by executing the following command:
