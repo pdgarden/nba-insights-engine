@@ -63,7 +63,7 @@ Once the set up is done, the app can be launched by executing the following comm
 uv run python -m streamlit run app/insights_app.py
 ```
 
-To run the benchmarks:
+To run the benchmarks (you must have the env var `OPENROUTER_API_KEY` available to run the benchmarks):
 ```sh
 uv run python benchmark/benchmark_ner_retrieval_pipeline.py
 ```
