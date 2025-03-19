@@ -2,7 +2,7 @@
 
 [![Actions status](https://github.com/pdgarden/nba-insights-engine/actions/workflows/ci.yaml/badge.svg)](https://github.com/pdgarden/nba-insights-engine/actions)
 <img src="https://img.shields.io/badge/python-3.12-blue" alt="Supported Python version">
-<img src="https://img.shields.io/static/v1?logo=uv&label=uv&message=0.5.10&color=blue">
+<img src="https://img.shields.io/static/v1?logo=uv&label=uv&message=0.6.6&color=blue">
 
 
 
@@ -37,7 +37,7 @@ Example of questions:
 # 2. Prerequisites
 
 The project uses:
-- uv (`v0.5.10`) to handle python version and dependencies.
+- uv (`v0.6.6`) to handle python version and dependencies.
 - ollama (`v0.5.5`) by default, but this can be replaced by any other LLM through env var settings.
 
 
@@ -46,9 +46,9 @@ The project uses:
 
 ## 3.1 Set up
 
-1. Install uv (v0.5.10):
-   1. For macOS / Linux `curl -LsSf https://astral.sh/uv/0.5.10/install.sh | sh`
-   2. For windows: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.5.10/install.ps1 | iex"`
+1. Install uv (v0.6.6):
+   1. For macOS / Linux `curl -LsSf https://astral.sh/uv/0.6.6/install.sh | sh`
+   2. For windows: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.6.6/install.ps1 | iex"`
 2. Create virtual environment: `uv sync --all-groups`
 3. Make sure your environment variables are correctly set up to use your desired inference provider
 4. To develop (Optional):
