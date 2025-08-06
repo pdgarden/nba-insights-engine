@@ -132,14 +132,120 @@ For each benchmark, a small test set was created and a bunch of models were test
 
 **SQL generation pipeline results:**
 
-| Model**                                        | Accuracy  |
-|----------------------------------------------- |---------- |
-| mistralai/mistral-small-24b-instruct-2501:free | 50.0%     |
-| nvidia/llama-3.1-nemotron-70b-instruct:free    | 75.0%     |
-| meta-llama/llama-3.3-70b-instruct:free         | 81.25%    |
-| deepseek/deepseek-chat:free                    | 68.75%    |
+
+| Model                                                       | Prompt       | Accuracy  |
+|------------------------------------------------------------ | ------------ |---------- |
+| mistralai/mistral-small-24b-instruct-2501:free**            | no thinking  | 50.0%     |
+| nvidia/llama-3.1-nemotron-70b-instruct:free**               | no thinking  | 75.0%     |
+| meta-llama/llama-3.3-70b-instruct:free**                    | no thinking  | 81.25%    |
+| deepseek/deepseek-chat:free**                               | no thinking  | 68.75%    |
+| hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL   | no thinking  | 68.75%    |
+| hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL   | thinking     | 81.25%    |
 
 ** _Model name from OpenRouter._
+
+
+<details>
+  <summary>No thinking prompt</summary>
+
+```
+    You are an expert in SQL and NBA data.
+    A user asks you this question:
+
+    {nba_data_query}
+
+
+    Generate a valid SQL query which will answer his question.
+    Be concise. Only retrieve the SQL query an nothing else.
+
+    Example of expected return:
+    ```sql
+    select t.column1, t.column2
+    from table t
+    where t.column3 = 'value'
+    ```
+
+    To answer, you have access to a PostgreSQL database with the following tables:
+    {db_description}
+
+```
+
+</details>
+
+<details>
+
+  <summary>Thinking prompt</summary>
+
+  ```
+  # Persona
+
+  You are data analyst specialized in BasketBall and NBA analytics.
+  Your main job is to receive questions from users and convert it into SQL queries.
+
+
+  # Instructions
+
+  A user asks you this question:
+
+      {nba_data_query}
+
+  Your task is to generate a valid SQL query which answers his question.
+  Start by thinking about the question and break it down step by step to figure out which tables you should use, how to join them, and so on.
+
+  # Output format
+
+  - You will start to think in a thinking tag following this format: <thinking>your-thoughts...</thinking>
+  - You wil then put the sql query in a sql query tag following this format: <>```sql select ...```</sql_query>
+
+
+  # Example of expected return:
+
+  ## User query: What is the name of the player who played the most minutes in the 2010 calendar year ? How many minutes did he play during this year?
+
+  ## Your response:
+
+  <thinking>
+  In order to answer this question:
+
+  I need to extract the following informations:
+  - player name: in `player.player_name`
+  - number of minutes per games: in `game_boxscore.minute_played`
+  - game date: in `game_summary.date`
+
+  I then need to find the matching keys between these tables:
+  - (player, game_boxscore): (id, player_id)
+  - (game_boxscore, game_summary): (game_id, game_summary.id)
+
+  I then need to filter the data: where game_summary.date in calendar year 2010
+  I then need to aggregate the data: By player_id, to compute the sum of minute_played
+  I then need to order the result by sum of minute_played by descending order
+  I then need to limit the result to 1
+  </thinking>
+
+  <sql_query>
+  ```sql
+  select p.player_name, sum(gb.minute_played) sum_minutes_played
+  from player p
+  inner join game_boxscore gb on gb.player_id = p.id
+  inner join game_summary gs on gs.id = gb.game_id
+  where extract(year from gs.date = 2010
+  order by 2 desc
+  limit 1
+  ``` \
+
+  <sql_query>
+
+  # Data
+
+  To answer, you have access to a PostgreSQL database with the following tables:
+  {db_description}
+
+  The SQL request that you'll generate will need to work effectively with the datbase, thus respecting the schema, keys, tables names, columns names and so on.
+
+  ```
+
+</details>
+
 
 # 7 Code Quality and Formatting
 
@@ -164,7 +270,9 @@ For each benchmark, a small test set was created and a bunch of models were test
   - Test agent to generate sql requests
   - Test intermediate step to generate sql request by filtering the columns / tables to use
   - Test other models
-  - Tet other prompts
+  - Test every models with thinking prompt
+  - Add reflection step on result with possible modification
+
 
 
 # 9. Complementary documentation

@@ -1,0 +1,391 @@
+[
+    {
+        "llm_model": "hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL",
+        "test_cases_results": [
+            {
+                "question": "Which player_id played the highest number of games with at least 20 points in the game ? Retrieve only the player_id.",
+                "expected_result": [
+                    {
+                        "player_id": "5d840cd3c34bddb0032e549468dc93944709b9c35bf4669db3628e29e7f8ef3c"
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "player_id": "5d840cd3c34bddb0032e549468dc93944709b9c35bf4669db3628e29e7f8ef3c"
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"Which player_id played the highest number of games with at least 20 points in the game?\", I need to:\n\n1. Identify the relevant table for player points per game: `game_boxscore` contains the `points` column, which records the points scored by a player in a specific game.\n2. The `player_id` is available in the `game_boxscore` table.\n3. I need to filter games where `points >= 20`.\n4. Count the number of such games per `player_id`.\n5. Find the `player_id` with the maximum count of games with at least 20 points.\n6. Return only the `player_id`.\n\nSteps:\n- Filter `game_boxscore` where `points >= 20`.\n- Group by `player_id`.\n- Count the number of games per player.\n- Order by the count in descending order.\n- Limit to 1 to get the player with the highest count.\n\nNo joins are needed since all required data (player_id and points) is in the `game_boxscore` table.\n</thinking>\n\n<sql_query>\n```sql\nSELECT player_id\nFROM game_boxscore\nWHERE points >= 20\nGROUP BY player_id\nORDER BY COUNT(*) DESC\nLIMIT 1;\n```</sql_query>",
+                "computed_sql_query": "\nSELECT player_id\nFROM game_boxscore\nWHERE points >= 20\nGROUP BY player_id\nORDER BY COUNT(*) DESC\nLIMIT 1;\n",
+                "is_correct": true
+            },
+            {
+                "question": "Which player_id scored the highest number of points in a game? Retrieve the player id and the number of points scored.",
+                "expected_result": [
+                    {
+                        "player_id": "172f44a95b6cb6f06d77fd7ccf9a254065b1416d3a82e2fb74ea465089600fb6",
+                        "points": 81
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "player_id": "172f44a95b6cb6f06d77fd7ccf9a254065b1416d3a82e2fb74ea465089600fb6",
+                        "points": 81
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"Which player_id scored the highest number of points in a game? Retrieve the player id and the number of points scored.\"\n\nStep-by-step breakdown:\n\n1. The key information needed:\n   - player_id: from the `game_boxscore` table (column `player_id`)\n   - points scored in a game: from the `game_boxscore` table (column `points`)\n\n2. There is no need to join with other tables because:\n   - The `game_boxscore` table already contains both `player_id` and `points` for each player in each game.\n   - We are looking for the highest points scored in a single game, not over a season or career.\n\n3. Since we want the player who scored the most points in any single game:\n   - We need to find the maximum value of `points` in the `game_boxscore` table.\n   - Return the corresponding `player_id` and `points`.\n\n4. The query should:\n   - Select `player_id` and `points` from `game_boxscore`.\n   - Order by `points` in descending order.\n   - Limit to 1 result to get the highest-scoring game.\n\nNo filtering or joining is required beyond selecting from `game_boxscore`.\n</thinking>\n\n<sql_query>\n```sql\nSELECT player_id, points\nFROM game_boxscore\nORDER BY points DESC\nLIMIT 1;\n```</sql_query>",
+                "computed_sql_query": "\nSELECT player_id, points\nFROM game_boxscore\nORDER BY points DESC\nLIMIT 1;\n",
+                "is_correct": true
+            },
+            {
+                "question": "What is highest number of points scored in a single game by a team, eitheir playing at home or away ? Retrieve only the number named max_score.",
+                "expected_result": [
+                    {
+                        "max_score": 176
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "max_score": 176.0
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"What is the highest number of points scored in a single game by a team, either playing at home or away? Retrieve only the number named max_score.\"\n\nStep-by-step breakdown:\n\n1. The goal is to find the maximum points scored by any team in a single game \u2014 regardless of whether they were home or away.\n2. The relevant table for game scores is `game_summary`, which contains:\n   - `home_team_points`: points scored by the home team\n   - `away_team_points`: points scored by the away team\n3. We need to extract both values and find the maximum among all games.\n4. Since we are looking for the highest single-game score (by any team), we can use a `UNION ALL` or `GREATEST` function across both columns, but the cleanest way is to use `UNPIVOT` logic via `VALUES` or `UNION ALL`.\n5. Alternatively, we can use `GREATEST(home_team_points, away_team_points)` for each game and then take the maximum of those values.\n6. We only need the final maximum score (max_score), so we select `MAX(GREATEST(home_team_points, away_team_points))`.\n\nThis query will return a single number: the highest points scored by any team in any single game.\n\nNo joins are needed because all required data is in `game_summary`.\n</thinking>\n\n<sql_query>\n```sql\nSELECT MAX(GREATEST(home_team_points, away_team_points)) AS max_score\nFROM game_summary;\n```\n</sql_query>",
+                "computed_sql_query": "\nSELECT MAX(GREATEST(home_team_points, away_team_points)) AS max_score\nFROM game_summary;\n",
+                "is_correct": true
+            },
+            {
+                "question": "What is highest number of blocks made by a player in a single game ? Return only the number named max_blocks.",
+                "expected_result": [
+                    {
+                        "max_blocks": 12
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "max_blocks": 12
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"What is the highest number of blocks made by a player in a single game?\", I need to:\n\n1. Identify the relevant table that contains block data per player per game. The `game_boxscore` table has a column `blocks` which records the number of blocks a player made in a specific game.\n\n2. Since we are looking for the maximum number of blocks in a single game (not across multiple games or seasons), I need to find the maximum value of the `blocks` column in the `game_boxscore` table.\n\n3. The question asks only for the number (the maximum value), so I will return just the maximum value of `blocks`, named as `max_blocks`.\n\n4. No joins are needed because all required data is in the `game_boxscore` table.\n\n5. Use the `MAX()` function to get the highest number of blocks, and alias it as `max_blocks`.\n</thinking>\n\n<sql_query>\n```sql\nSELECT MAX(blocks) AS max_blocks\nFROM game_boxscore;\n```",
+                "computed_sql_query": "\nSELECT MAX(blocks) AS max_blocks\nFROM game_boxscore;\n",
+                "is_correct": true
+            },
+            {
+                "question": "What is the highest winning percentage by a team in a season (precision to 0.2%)? Return the result in percentage, scaled between 0 and 100 and name it max_pct_game_win.",
+                "expected_result": [
+                    {
+                        "max_pct_game_win": 89.02
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "max_pct_game_win": 89.0
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"What is the highest winning percentage by a team in a season (precision to 0.2%)? Return the result in percentage, scaled between 0 and 100 and name it max_pct_game_win.\"\n\nStep-by-step breakdown:\n\n1. The goal is to find the maximum winning percentage across all teams in any season.\n2. The relevant table for team win percentages per season is `team_season`, which contains:\n   - `pct_game_win`: the winning percentage (as a decimal, e.g., 0.75 for 75%).\n3. We need to extract the maximum value of `pct_game_win` from this table.\n4. The question asks for the result in percentage, scaled between 0 and 100. So we must multiply `pct_game_win` by 100.\n5. The precision requirement is 0.2%, meaning we should round to one decimal place (e.g., 78.4%).\n6. We need to return the result as a column named `max_pct_game_win`.\n\nNo joins are needed because `team_season` already contains the winning percentage per team per season.\n\nThus, the query is straightforward: select the maximum of `pct_game_win * 100`, rounded to one decimal place (to achieve 0.2% precision), and alias it as `max_pct_game_win`.\n</thinking>\n\n<sql_query>\n```sql\nSELECT ROUND(MAX(pct_game_win * 100), 1) AS max_pct_game_win\nFROM team_season;\n```</sql_query>",
+                "computed_sql_query": "\nSELECT ROUND(MAX(pct_game_win * 100), 1) AS max_pct_game_win\nFROM team_season;\n",
+                "is_correct": false
+            },
+            {
+                "question": "What is the difference between the average number of games scored by a home team and an away team (Rounded to 0,1). Return only the number, named avg_diff.",
+                "expected_result": [
+                    {
+                        "avg_diff": 2.9
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "avg_diff": 2.9
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"What is the difference between the average number of games scored by a home team and an away team (Rounded to 0.1)? Return only the number, named avg_diff.\"\n\nLet's break it down step by step:\n\n1. The question asks for the **average number of games scored** by home teams vs away teams. However, \"games scored\" is ambiguous \u2014 in basketball, we usually refer to points scored per game.\n\n2. Looking at the schema:\n   - `game_summary` contains `home_team_points` and `away_team_points`, which are the total points scored by each team in a game.\n   - We need to compute the **average points per game** for home teams and away teams separately.\n\n3. The `game_summary` table has:\n   - `home_team_points`: points scored by the home team\n   - `away_team_points`: points scored by the away team\n   - Each row represents one game.\n\n4. So, to compute:\n   - Average home team points: AVG(home_team_points)\n   - Average away team points: AVG(away_team_points)\n\n5. Then compute the difference: AVG(home_team_points) - AVG(away_team_points)\n\n6. Round the result to 1 decimal place (0.1 precision).\n\n7. Return only the number, named `avg_diff`.\n\nNo joins are needed \u2014 all required data is in `game_summary`.\n\n</thinking>\n\n<sql_query>\n```sql\nSELECT ROUND(AVG(home_team_points) - AVG(away_team_points), 1) AS avg_diff\nFROM game_summary;\n```</sql_query>",
+                "computed_sql_query": "\nSELECT ROUND(AVG(home_team_points) - AVG(away_team_points), 1) AS avg_diff\nFROM game_summary;\n",
+                "is_correct": true
+            },
+            {
+                "question": "What is the average cumulated number of points (Rounded to 0,1) scored in a game depending if it is during regular season or not. Return the columns is_regular_season and avg_points, ordered by is_regular_season.",
+                "expected_result": [
+                    {
+                        "is_regular_season": false,
+                        "avg_points": 197.8
+                    },
+                    {
+                        "is_regular_season": true,
+                        "avg_points": 203.8
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "is_regular_season": false,
+                        "avg_points": 197.8
+                    },
+                    {
+                        "is_regular_season": true,
+                        "avg_points": 203.8
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question:\n\nI need to find the average cumulated number of points scored in a game, grouped by whether it is a regular season game or not. The key points are:\n- The column `is_regular_season` is in the `game_summary` table.\n- The total points scored in a game can be derived from the sum of points from both teams. This information is available in `game_summary` as `home_team_points` and `away_team_points`.\n- I need to calculate the average of the total points per game (i.e., home_team_points + away_team_points) for each group: regular season or not.\n- The result should be rounded to 1 decimal place.\n- The output must include two columns: `is_regular_season` and `avg_points`, ordered by `is_regular_season`.\n\nSteps:\n1. Join `game_summary` with itself (or just use it directly) since all needed data is in this table.\n2. Calculate total points per game: `home_team_points + away_team_points`.\n3. Group by `is_regular_season`.\n4. Compute the average of total points per group.\n5. Round the result to 1 decimal place using `ROUND(..., 1)`.\n6. Order by `is_regular_season`.\n\nNote: Since `is_regular_season` is a BOOLEAN, it will be either TRUE or FALSE, and ordering will naturally put FALSE first, then TRUE \u2014 which matches the expected order.\n</thinking>\n\n<sql_query>\n```sql\nSELECT \n    is_regular_season,\n    ROUND(AVG(home_team_points + away_team_points), 1) AS avg_points\nFROM \n    game_summary\nGROUP BY \n    is_regular_season\nORDER BY \n    is_regular_season;\n```</sql_query>",
+                "computed_sql_query": "\nSELECT \n    is_regular_season,\n    ROUND(AVG(home_team_points + away_team_points), 1) AS avg_points\nFROM \n    game_summary\nGROUP BY \n    is_regular_season\nORDER BY \n    is_regular_season;\n",
+                "is_correct": true
+            },
+            {
+                "question": "What is the highest number of points scored in a single game by LeBron James ? Return only the the number, named max_pts",
+                "expected_result": [
+                    {
+                        "max_pts": 61
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "max_pts": 61
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"What is the highest number of points scored in a single game by LeBron James?\", I need to:\n\n1. Identify LeBron James in the `player` table using his `player_name`.\n2. Find all games he played in using the `game_boxscore` table, which contains the `points` column and links to players via `player_id`.\n3. Extract the maximum value of `points` from the `game_boxscore` table for LeBron James.\n4. Return only the highest points scored, named as `max_pts`.\n\nSteps:\n- Join `player` and `game_boxscore` tables on `player.id = game_boxscore.player_id`.\n- Filter for `player_name = 'LeBron James'`.\n- Use `MAX(points)` to find the highest points in a single game.\n- Alias the result as `max_pts`.\n\nNo other filtering or aggregation is needed beyond finding the maximum points scored by LeBron James in any single game.\n</thinking>\n\n<sql_query>\n```sql\nSELECT MAX(gb.points) AS max_pts\nFROM player p\nJOIN game_boxscore gb ON p.id = gb.player_id\nWHERE p.player_name = 'LeBron James';\n```</sql_query>",
+                "computed_sql_query": "\nSELECT MAX(gb.points) AS max_pts\nFROM player p\nJOIN game_boxscore gb ON p.id = gb.player_id\nWHERE p.player_name = 'LeBron James';\n",
+                "is_correct": true
+            },
+            {
+                "question": "Which player scored the highest number of points in a single game ? Return the player name as player_name, and the number of points as nb_points.",
+                "expected_result": [
+                    {
+                        "player_name": "Kobe Bryant",
+                        "nb_points": 81
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "player_name": "Kobe Bryant",
+                        "nb_points": 81
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"Which player scored the highest number of points in a single game?\", I need to:\n\n1. Identify the relevant table for player points per game: `game_boxscore` contains the `points` column, which records the number of points a player scored in a specific game.\n2. Identify the player name: The `player` table has the `player_name` column.\n3. Link the tables: The `game_boxscore` table has a `player_id` that can be joined with the `id` column in the `player` table.\n4. Find the maximum points scored in a single game: I need to find the highest value in the `points` column from `game_boxscore`.\n5. Return the player name and the number of points.\n\nSince we are looking for the highest points in a single game (not cumulative), I will:\n- Join `player` and `game_boxscore` on `player.id = game_boxscore.player_id`\n- Select `player.player_name` and `game_boxscore.points`\n- Order by `points` in descending order\n- Limit to 1 result to get the player with the highest points in a single game\n\nNo filtering by date or season is needed since the question asks for the highest single-game points regardless of when it occurred.\n</thinking>\n\n<sql_query>\n```sql\nSELECT p.player_name, gb.points AS nb_points\nFROM player p\nINNER JOIN game_boxscore gb ON p.id = gb.player_id\nORDER BY gb.points DESC\nLIMIT 1;\n```\n</sql_query>",
+                "computed_sql_query": "\nSELECT p.player_name, gb.points AS nb_points\nFROM player p\nINNER JOIN game_boxscore gb ON p.id = gb.player_id\nORDER BY gb.points DESC\nLIMIT 1;\n",
+                "is_correct": true
+            },
+            {
+                "question": "Which team scored the highest number of points in a single game while being the home team ? Return only the team name as team_name",
+                "expected_result": [
+                    {
+                        "team_name": "Los Angeles Clippers"
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "team_name": "Los Angeles Clippers"
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"Which team scored the highest number of points in a single game while being the home team? Return only the team name as team_name\"\n\nStep-by-step breakdown:\n\n1. Identify the relevant tables:\n   - `game_summary`: Contains the home_team_points and away_team_points, along with the home_team_id and away_team_id.\n   - `team` or `team_bis`: To get the team_name from the team_id.\n\n2. The condition is that the team must be the **home team** in a game. So we need to look at the `home_team_id` in `game_summary`.\n\n3. We are interested in the **maximum home_team_points** across all games.\n\n4. We need to join `game_summary` with `team` (or `team_bis`) on `home_team_id = team.id` to get the team name.\n\n5. Since we want only the team name that scored the highest points as a home team, we:\n   - Filter for games where the team was the home team.\n   - Select the team_name corresponding to the maximum home_team_points.\n   - Use ORDER BY home_team_points DESC and LIMIT 1 to get the top team.\n\n6. The output should return only the `team_name`.\n\nNote: The `game_summary` table has `home_team_id`, which links to `team.id`. We use `team` table for team_name.\n\n</thinking>\n\n<sql_query>\n```sql\nSELECT t.team_name\nFROM game_summary gs\nJOIN team t ON gs.home_team_id = t.id\nORDER BY gs.home_team_points DESC\nLIMIT 1;\n```</sql_query>",
+                "computed_sql_query": "\nSELECT t.team_name\nFROM game_summary gs\nJOIN team t ON gs.home_team_id = t.id\nORDER BY gs.home_team_points DESC\nLIMIT 1;\n",
+                "is_correct": true
+            },
+            {
+                "question": "Which player scored the highest number of blocks in a single game ? If there is several players, return them all. Return the columns player_name and max_nb_blocks. Sort by player name.",
+                "expected_result": [
+                    {
+                        "player_name": "Hassan Whiteside",
+                        "max_nb_blocks": 12
+                    },
+                    {
+                        "player_name": "JaVale McGee",
+                        "max_nb_blocks": 12
+                    },
+                    {
+                        "player_name": "Keon Clark",
+                        "max_nb_blocks": 12
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "player_name": "Hassan Whiteside",
+                        "max_nb_blocks": 12
+                    },
+                    {
+                        "player_name": "JaVale McGee",
+                        "max_nb_blocks": 12
+                    },
+                    {
+                        "player_name": "Keon Clark",
+                        "max_nb_blocks": 12
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"Which player scored the highest number of blocks in a single game? If there is several players, return them all. Return the columns player_name and max_nb_blocks. Sort by player name.\"\n\nStep-by-step breakdown:\n\n1. The key metric we are interested in is the maximum number of blocks (`blocks`) recorded in a single game.\n2. The `game_boxscore` table contains the `blocks` column for each player per game, along with `player_id` and `game_id`.\n3. The `player` table contains the `player_name` linked by `id = player_id`.\n4. We need to find the maximum value of `blocks` across all games.\n5. Since multiple players might have achieved the same highest number of blocks in different games, we must return all such players.\n6. We will join `game_boxscore` with `player` on `player_id = id`.\n7. We will filter for the maximum `blocks` value (using a subquery or window function).\n8. Then select `player_name` and the `blocks` value (as max_nb_blocks).\n9. Sort the results by `player_name`.\n\nApproach:\n- Use a subquery to find the maximum number of blocks in any single game.\n- Join `game_boxscore` with `player` to get player names.\n- Filter rows where `blocks` equals that maximum.\n- Select `player_name` and `blocks` (aliased as `max_nb_blocks`).\n- Order by `player_name`.\n\nNote: The `blocks` column in `game_boxscore` is of type INTEGER, so we can directly compare it.\n\n</thinking>\n\n<sql_query>\n```sql\nSELECT p.player_name, gb.blocks AS max_nb_blocks\nFROM game_boxscore gb\nJOIN player p ON gb.player_id = p.id\nWHERE gb.blocks = (SELECT MAX(blocks) FROM game_boxscore)\nORDER BY p.player_name;\n```\n</sql_query>",
+                "computed_sql_query": "\nSELECT p.player_name, gb.blocks AS max_nb_blocks\nFROM game_boxscore gb\nJOIN player p ON gb.player_id = p.id\nWHERE gb.blocks = (SELECT MAX(blocks) FROM game_boxscore)\nORDER BY p.player_name;\n",
+                "is_correct": true
+            },
+            {
+                "question": "How many games per season did LeBron James played in average between 2005 and 2015 included ? Return the column avg_nb_games rounded to 0,1.",
+                "expected_result": [
+                    {
+                        "avg_nb_games": 75.3
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "avg_nb_games": 75.3
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"How many games per season did LeBron James play in average between 2005 and 2015 included? Return the column avg_nb_games rounded to 0.1.\"\n\nStep-by-step breakdown:\n\n1. Identify the player: LeBron James. His name is in the `player` table under `player_name`. We need to get his `id`.\n\n2. The number of games played per season by a player is stored in the `player_season` table under `nb_games`, which corresponds to each season.\n\n3. We need to filter for seasons between 2005 and 2015 inclusive. The `season` table has a `start_year` and `end_year` column. Since the seasons are labeled by their start year (e.g., 2005\u20132006 season has start_year = 2005), we can filter where `start_year` is between 2005 and 2015.\n\n4. We need to join:\n   - `player` with `player_season` on `player.id = player_season.player_id`\n   - `player_season` with `season` on `player_season.season_id = season.id`\n\n5. Filter for:\n   - `player.player_name = 'LeBron James'`\n   - `season.start_year >= 2005 AND season.start_year <= 2015`\n\n6. Compute the average of `nb_games` across these seasons.\n\n7. Round the result to 1 decimal place using `ROUND(avg_nb_games, 1)`.\n\nNote: The question asks for \"average games per season\" \u2014 this is exactly what `AVG(nb_games)` gives us over the selected seasons.\n\n</thinking>\n\n<sql_query>\n```sql\nSELECT ROUND(AVG(ps.nb_games), 1) AS avg_nb_games\nFROM player p\nJOIN player_season ps ON p.id = ps.player_id\nJOIN season s ON ps.season_id = s.id\nWHERE p.player_name = 'LeBron James'\n  AND s.start_year >= 2005\n  AND s.start_year <= 2015;\n```\n</sql_query>",
+                "computed_sql_query": "\nSELECT ROUND(AVG(ps.nb_games), 1) AS avg_nb_games\nFROM player p\nJOIN player_season ps ON p.id = ps.player_id\nJOIN season s ON ps.season_id = s.id\nWHERE p.player_name = 'LeBron James'\n  AND s.start_year >= 2005\n  AND s.start_year <= 2015;\n",
+                "is_correct": true
+            },
+            {
+                "question": "What is the average number of three point attempts per player per game for every years between 2005 and 2007 included ? Return the column season_years and avg_nb_3pt_attempts rounded to 0,1.",
+                "expected_result": [
+                    {
+                        "season_years": "2005-2006",
+                        "avg_nb_3pt_attempts": 1.6
+                    },
+                    {
+                        "season_years": "2006-2007",
+                        "avg_nb_3pt_attempts": 1.7
+                    },
+                    {
+                        "season_years": "2007-2008",
+                        "avg_nb_3pt_attempts": 1.8
+                    }
+                ],
+                "computed_result": "ERROR: Binder Error: column \"start_year\" must appear in the GROUP BY clause or must be part of an aggregate function.\nEither add it to the GROUP BY list, or use \"ANY_VALUE(start_year)\" if the exact value of \"start_year\" is not important.",
+                "llm_response": "ERROR: Binder Error: column \"start_year\" must appear in the GROUP BY clause or must be part of an aggregate function.\nEither add it to the GROUP BY list, or use \"ANY_VALUE(start_year)\" if the exact value of \"start_year\" is not important.",
+                "computed_sql_query": "",
+                "is_correct": false
+            },
+            {
+                "question": "What is the average number of three point attempts for the entire team per game, for every years between 2010 and 2015 included ? Return the column season_start_year and avg_nb_3pt_attempts rounded to 0,1.",
+                "expected_result": [
+                    {
+                        "start_year": 2010,
+                        "avg_nb_3pt_attempts": 18.0
+                    },
+                    {
+                        "start_year": 2011,
+                        "avg_nb_3pt_attempts": 18.3
+                    },
+                    {
+                        "start_year": 2012,
+                        "avg_nb_3pt_attempts": 20.0
+                    },
+                    {
+                        "start_year": 2013,
+                        "avg_nb_3pt_attempts": 21.6
+                    },
+                    {
+                        "start_year": 2014,
+                        "avg_nb_3pt_attempts": 22.6
+                    },
+                    {
+                        "start_year": 2015,
+                        "avg_nb_3pt_attempts": 24.2
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "season_start_year": 2010,
+                        "avg_nb_3pt_attempts": 36.0
+                    },
+                    {
+                        "season_start_year": 2011,
+                        "avg_nb_3pt_attempts": 36.7
+                    },
+                    {
+                        "season_start_year": 2012,
+                        "avg_nb_3pt_attempts": 40.0
+                    },
+                    {
+                        "season_start_year": 2013,
+                        "avg_nb_3pt_attempts": 43.2
+                    },
+                    {
+                        "season_start_year": 2014,
+                        "avg_nb_3pt_attempts": 45.2
+                    },
+                    {
+                        "season_start_year": 2015,
+                        "avg_nb_3pt_attempts": 48.4
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question:\n\nI need to find the average number of three-point attempts for an entire team per game, for each season between 2010 and 2015 (inclusive). The output should include:\n- The start year of the season (season_start_year)\n- The average number of three-point attempts per game, rounded to 1 decimal place.\n\nSteps:\n1. Identify relevant tables:\n   - `game_boxscore`: contains `three_pts_attempts` and `game_id`.\n   - `game_summary`: contains `game_id` and `season_id`.\n   - `season`: contains `id`, `start_year`, and `years`.\n\n2. Join logic:\n   - Join `game_boxscore` with `game_summary` on `game_id`.\n   - Join `game_summary` with `season` on `season_id = season.id`.\n\n3. Filter:\n   - Only include seasons where `start_year` is between 2010 and 2015 (inclusive).\n\n4. Aggregation:\n   - For each season (`start_year`), compute the total number of three-point attempts across all games.\n   - Divide by the number of games in that season to get average per game.\n   - The number of games per season can be derived from `team_season` or inferred via `game_summary` (count of games per season_id).\n\n5. Round the result to 1 decimal place using `ROUND(..., 1)`.\n\n6. Group by `season.start_year`.\n\nNote: Since we want team-wide average across all teams in a season, and each game has two teams, we need to sum `three_pts_attempts` for both home and away teams per game, then divide by total number of games in the season.\n\nBut since `game_boxscore` contains one row per player per game, and multiple players per team per game, we must aggregate at the game level first: sum all `three_pts_attempts` per game (across all players), then average over the number of games in that season.\n\nSo:\n- For each game, sum `three_pts_attempts` across all players (from `game_boxscore`) \u2192 total 3PA per game.\n- Then, for each season, compute: SUM(total_3PA_per_game) / COUNT(games) = avg 3PA per game.\n\nWe can do this by:\n- Grouping `game_boxscore` by `game_id`, summing `three_pts_attempts`.\n- Then joining with `game_summary` and `season` to get the season start year.\n- Then averaging over all games in each season.\n\n</thinking>\n\n<sql_query>\n```sql\nSELECT \n    s.start_year AS season_start_year,\n    ROUND(AVG(game_3pa.total_3pt_attempts_per_game), 1) AS avg_nb_3pt_attempts\nFROM (\n    -- Step 1: For each game, sum all three-point attempts across all players\n    SELECT \n        gb.game_id,\n        SUM(gb.three_pts_attempts) AS total_3pt_attempts_per_game\n    FROM game_boxscore gb\n    GROUP BY gb.game_id\n) AS game_3pa\nINNER JOIN game_summary gs ON game_3pa.game_id = gs.id\nINNER JOIN season s ON gs.season_id = s.id\nWHERE s.start_year BETWEEN 2010 AND 2015\nGROUP BY s.start_year\nORDER BY s.start_year;\n```</sql_query>",
+                "computed_sql_query": "\nSELECT \n    s.start_year AS season_start_year,\n    ROUND(AVG(game_3pa.total_3pt_attempts_per_game), 1) AS avg_nb_3pt_attempts\nFROM (\n    -- Step 1: For each game, sum all three-point attempts across all players\n    SELECT \n        gb.game_id,\n        SUM(gb.three_pts_attempts) AS total_3pt_attempts_per_game\n    FROM game_boxscore gb\n    GROUP BY gb.game_id\n) AS game_3pa\nINNER JOIN game_summary gs ON game_3pa.game_id = gs.id\nINNER JOIN season s ON gs.season_id = s.id\nWHERE s.start_year BETWEEN 2010 AND 2015\nGROUP BY s.start_year\nORDER BY s.start_year;\n",
+                "is_correct": false
+            },
+            {
+                "question": "Which player scored the most number of points in average per season for each year between 2005 and 2007 ? Return the column season_start_year, player_name and avg_points (rounded to 0,2), order by season_start_year.",
+                "expected_result": [
+                    {
+                        "season_start_year": 2005,
+                        "player_name": "Kobe Bryant",
+                        "avg_points": 35.4
+                    },
+                    {
+                        "season_start_year": 2006,
+                        "player_name": "Kobe Bryant",
+                        "avg_points": 31.56
+                    },
+                    {
+                        "season_start_year": 2007,
+                        "player_name": "LeBron James",
+                        "avg_points": 30.0
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "season_start_year": 2005,
+                        "player_name": "Kobe Bryant",
+                        "avg_points": 35.4
+                    },
+                    {
+                        "season_start_year": 2006,
+                        "player_name": "Kobe Bryant",
+                        "avg_points": 31.56
+                    },
+                    {
+                        "season_start_year": 2007,
+                        "player_name": "LeBron James",
+                        "avg_points": 30.0
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question:\n\nI need to find the player who scored the most points on average per season for each year between 2005 and 2007.\n\nKey points:\n- The time range is from 2005 to 2007 (inclusive), so I need to filter seasons where start_year is in [2005, 2006, 2007].\n- I need the average points per season for each player, which is stored in the `player_season` table under `avg_points`.\n- The `season` table contains the `start_year` column, which I can use to filter the years.\n- I need to join `player_season` with `season` on `season_id = id` to get the `start_year`.\n- For each year (start_year), I want the player with the highest `avg_points`.\n- Since we want one player per year, I need to group by `start_year`, and for each group, pick the player with the maximum `avg_points`.\n- The output should include: `season_start_year`, `player_name`, and `avg_points` rounded to 2 decimal places.\n- Order the results by `season_start_year`.\n\nSteps:\n1. Join `player_season` with `season` on `player_season.season_id = season.id`.\n2. Filter for `season.start_year` between 2005 and 2007.\n3. For each `start_year`, find the player with the maximum `avg_points`.\n4. Use window functions or subqueries to get the top player per year.\n5. Round `avg_points` to 2 decimal places.\n6. Select `start_year`, `player_name`, and rounded `avg_points`.\n7. Order by `start_year`.\n\nI will use a window function (ROW_NUMBER) to rank players within each season by `avg_points` descending, then filter for the top-ranked player per year.\n</thinking>\n\n<sql_query>\n```sql\nSELECT \n    s.start_year AS season_start_year,\n    p.player_name,\n    ROUND(ps.avg_points, 2) AS avg_points\nFROM player_season ps\nINNER JOIN season s ON ps.season_id = s.id\nINNER JOIN player p ON ps.player_id = p.id\nWHERE s.start_year BETWEEN 2005 AND 2007\n  AND ps.avg_points IS NOT NULL\n  AND p.player_name IS NOT NULL\n  AND s.start_year IS NOT NULL\n  AND ps.season_id IS NOT NULL\n  AND p.id IS NOT NULL\n  AND ps.player_id IS NOT NULL\n  AND s.id IS NOT NULL\n  AND s.start_year IN (2005, 2006, 2007)\n  AND ps.avg_points > 0\nQUALIFY ROW_NUMBER() OVER (PARTITION BY s.start_year ORDER BY ps.avg_points DESC) = 1\nORDER BY s.start_year;\n```\n</sql_query>",
+                "computed_sql_query": "\nSELECT \n    s.start_year AS season_start_year,\n    p.player_name,\n    ROUND(ps.avg_points, 2) AS avg_points\nFROM player_season ps\nINNER JOIN season s ON ps.season_id = s.id\nINNER JOIN player p ON ps.player_id = p.id\nWHERE s.start_year BETWEEN 2005 AND 2007\n  AND ps.avg_points IS NOT NULL\n  AND p.player_name IS NOT NULL\n  AND s.start_year IS NOT NULL\n  AND ps.season_id IS NOT NULL\n  AND p.id IS NOT NULL\n  AND ps.player_id IS NOT NULL\n  AND s.id IS NOT NULL\n  AND s.start_year IN (2005, 2006, 2007)\n  AND ps.avg_points > 0\nQUALIFY ROW_NUMBER() OVER (PARTITION BY s.start_year ORDER BY ps.avg_points DESC) = 1\nORDER BY s.start_year;\n",
+                "is_correct": true
+            },
+            {
+                "question": "Retrieve the top 5 teams of the season starting in 2022 by winning percentage. Return only the column team_name",
+                "expected_result": [
+                    {
+                        "team_name": "Milwaukee Bucks"
+                    },
+                    {
+                        "team_name": "Boston Celtics"
+                    },
+                    {
+                        "team_name": "Philadelphia 76ers"
+                    },
+                    {
+                        "team_name": "Denver Nuggets"
+                    },
+                    {
+                        "team_name": "Memphis Grizzlies"
+                    }
+                ],
+                "computed_result": [
+                    {
+                        "team_name": "Milwaukee Bucks"
+                    },
+                    {
+                        "team_name": "Boston Celtics"
+                    },
+                    {
+                        "team_name": "Philadelphia 76ers"
+                    },
+                    {
+                        "team_name": "Denver Nuggets"
+                    },
+                    {
+                        "team_name": "Memphis Grizzlies"
+                    }
+                ],
+                "llm_response": "<thinking>\nTo answer the question: \"Retrieve the top 5 teams of the season starting in 2022 by winning percentage. Return only the column team_name\"\n\nStep-by-step breakdown:\n\n1. Identify the relevant tables:\n   - `team_season`: contains team performance per season, including number of games won (`nb_game_win`) and total games played (`nb_game`), which can be used to compute winning percentage.\n   - `season`: contains information about the season, including `start_year` and `end_year`. We need the season starting in 2022, so we look for `start_year = 2022`.\n   - `team_bis` or `team`: contains the `team_name`. Since both tables have `team_name`, but `team_bis` is likely a duplicate or alternative, I'll use `team` as it's more standard.\n\n2. Join logic:\n   - Join `team_season` with `season` on `season_id = id` to filter by season starting in 2022.\n   - Join `team_season` with `team` on `team_id = id` to get the team name.\n\n3. Filter:\n   - Only include rows where `start_year = 2022`.\n\n4. Compute winning percentage:\n   - Winning percentage = `nb_game_win / nb_game`\n   - Since `nb_game_win` and `nb_game` are integers, we need to cast them to float to avoid integer division.\n\n5. Order by winning percentage descending.\n\n6. Limit to top 5 teams.\n\n7. Select only the `team_name`.\n\n</thinking>\n\n<sql_query>\n```sql\nSELECT t.team_name\nFROM team_season ts\nJOIN season s ON ts.season_id = s.id\nJOIN team t ON ts.team_id = t.id\nWHERE s.start_year = 2022\nORDER BY (ts.nb_game_win::DOUBLE PRECISION / ts.nb_game) DESC\nLIMIT 5;\n```</sql_query>",
+                "computed_sql_query": "\nSELECT t.team_name\nFROM team_season ts\nJOIN season s ON ts.season_id = s.id\nJOIN team t ON ts.team_id = t.id\nWHERE s.start_year = 2022\nORDER BY (ts.nb_game_win::DOUBLE PRECISION / ts.nb_game) DESC\nLIMIT 5;\n",
+                "is_correct": true
+            }
+        ],
+        "accuracy": 0.8125
+    }
+]
