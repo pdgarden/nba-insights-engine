@@ -6,6 +6,7 @@ from loguru import logger
 
 from app.db.dao import get_table_columns, get_tables
 from app.llm import query_llm
+from app.prompts import QUESTION_TO_SQL
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Functions
@@ -27,28 +28,10 @@ def get_db_description() -> str:
     return "\n\n".join(tables_desc.values())
 
 
-def build_prompt(question: str, db_description: str) -> str:
+def build_prompt(question: str, db_description: str, thinking_mode: bool) -> str:
     """Build prompt to retrieve SQL query from LLM."""
-    return f"""
-    You are an expert in SQL and NBA data.
-    A user asks you this question:
-
-    {question}
-
-
-    Generate a valid SQL query which will answer his question.
-    Be concise. Only retrieve the SQL query an nothing else.
-
-    Example of expected return:
-    ```sql
-    select t.column1, t.column2
-    from table t
-    where t.column3 = 'value'
-    ```
-
-    To answer, you have access to a PostgreSQL database with the following tables:
-    {db_description}
-    """
+    prompt = QUESTION_TO_SQL["THINKING"] if thinking_mode else QUESTION_TO_SQL["NO_THINKING"]
+    return prompt.format(question=question, db_description=db_description)
 
 
 def extract_sql_query(text: str) -> str:
@@ -61,10 +44,10 @@ def extract_sql_query(text: str) -> str:
     return text[start_index + len(sql_identifier) :].split("```")[0]
 
 
-def generate_sql_query(question: str) -> str:
+def generate_sql_query(question: str, thinking_mode: bool) -> str:
     """Generate SQL query from a question."""
     db_description = get_db_description()
-    prompt = build_prompt(question, db_description)
+    prompt = build_prompt(question=question, db_description=db_description, thinking_mode=thinking_mode)
     llm_response = query_llm(prompt=prompt, model_kind="heavy")
     logger.debug(f"llm_response: {llm_response}")
     sql_query = extract_sql_query(llm_response)
