@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from app.db.dao import get_players_names, get_teams_names
 from app.llm import query_llm
+from app.prompts import NER_RETRIEVAL
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Models
@@ -26,26 +27,7 @@ class PlayersAndTeams(BaseModel):
 
 def get_ner_prompt(text: str) -> str:
     """Get a name entity retrieval prompt for the LLM to extract players and teams from a text."""
-    return f"""
-You are given a text that may contain some NBA players and players and teams.
-Retrieve the list of players and teams from the text.
-DO NOT MODIFY THE NAMES OF THE PLAYERS AND TEAMS.
-Example n°1 :
-Input: "How many rebounds did mike pietrus have in the 2018 playoffs?"
-Output: {{'players': ['mike pietrus'], 'teams': []}}
-
-Example n°2 :
-Input: "How many points did Victor wembanyama have in the 2024 season for the spurs?"
-Output: {{'players': ['Victor wembanyama'], 'teams': ['spurs]}}
-
-Notice that the name of the player and team is not modified and no uppercase is added.
-
-Retrieve the result in the following format:  {PlayersAndTeams.model_json_schema()}
-
-Here is the text to process:
-
-{text}.
-"""
+    return NER_RETRIEVAL.format(text=text, expected_json_schema=PlayersAndTeams.model_json_schema())
 
 
 def get_closest_player_name(player_name: str, players_names: list[str]) -> str:
