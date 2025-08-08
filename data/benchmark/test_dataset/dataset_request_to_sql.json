@@ -28,7 +28,7 @@
     },
 
     {
-        "question":"What is the highest winning percentage by a team in a season (precision to 0.2%)? Return the result in percentage, scaled between 0 and 100 and name it max_pct_game_win.",
+        "question":"What is the highest winning percentage by a team in a season (precision to 0.01%, e.g. 11.22%)? Return the result in percentage, scaled between 0 and 100 and name it max_pct_game_win.",
         "num_tables_involved":1.0,
         "sql_query":"select round(100 * max(pct_game_win), 2) from team_season",
         "expected_result":[{"max_pct_game_win":89.02}]
@@ -85,17 +85,17 @@
     },
 
     {
-        "question":"What is the average number of three point attempts per player per game for every years between 2005 and 2007 included ? Return the column season_years and avg_nb_3pt_attempts rounded to 0,1.",
-        "num_tables_involved":3,
-        "sql_query":"SELECT s.years AS season_years, ROUND(AVG(gbs.three_pts_attempts), 1) AS avg_nb_3pt_attempts FROM  game_boxscore gbs JOIN  game_summary gs ON gbs.game_id = gs.id JOIN  season s ON gs.season_id = s.id WHERE  s.start_year BETWEEN 2005 AND 2007 GROUP BY  s.years ORDER BY  s.years;",
-        "expected_result":[{"season_years": "2005-2006", "avg_nb_3pt_attempts": 1.6}, {"season_years": "2006-2007", "avg_nb_3pt_attempts": 1.7}, {"season_years": "2007-2008", "avg_nb_3pt_attempts": 1.8}]
+        "question":"What is the average number of three point attempts per player per game for every calendar years between 2005 and 2007 included ? Return the column calendar_year and avg_nb_3pt_attempts rounded to 0,1.",
+        "num_tables_involved":2,
+        "sql_query":"SELECT  EXTRACT(YEAR FROM gs.date) AS calendar_year, ROUND(AVG(gb.three_pts_attempts), 1) AS avg_nb_3pt_attempts FROM game_boxscore gb JOIN game_summary gs ON gb.game_id = gs.id WHERE EXTRACT(YEAR FROM gs.date) BETWEEN 2005 AND 2007 GROUP BY EXTRACT(YEAR FROM gs.date) ORDER BY 1 ASC;",
+        "expected_result": [{"calendar_year":2005,"avg_nb_3pt_attempts":1.6},{"calendar_year":2006,"avg_nb_3pt_attempts":1.6},{"calendar_year":2007,"avg_nb_3pt_attempts":1.7}]
     },
 
     {
-        "question":"What is the average number of three point attempts for the entire team per game, for every years between 2010 and 2015 included ? Return the column season_start_year and avg_nb_3pt_attempts rounded to 0,1.",
-        "num_tables_involved":3,
-        "sql_query":"SELECT s.years AS season_years, ROUND(AVG(gbs.three_pts_attempts), 1) AS avg_nb_3pt_attempts FROM  game_boxscore gbs JOIN  game_summary gs ON gbs.game_id = gs.id JOIN  season s ON gs.season_id = s.id WHERE  s.start_year BETWEEN 2005 AND 2007 GROUP BY  s.years ORDER BY  s.years;",
-        "expected_result": [{"start_year": 2010, "avg_nb_3pt_attempts": 18.0}, {"start_year": 2011, "avg_nb_3pt_attempts": 18.3}, {"start_year": 2012, "avg_nb_3pt_attempts": 20.0}, {"start_year": 2013, "avg_nb_3pt_attempts": 21.6}, {"start_year": 2014, "avg_nb_3pt_attempts": 22.6}, {"start_year": 2015, "avg_nb_3pt_attempts": 24.2}]
+        "question":"What is the average number of three point attempts for the entire team per game, for every calendar year between 2010 and 2015 included ? Return the column calendar_year and avg_nb_3pt_attempts rounded to 0,1.",
+        "num_tables_involved":2,
+        "sql_query":"with attempts_per_game as ( select extract(year from gs.date) calendar_year, gb.game_id, gb.team_id, sum(three_pts_attempts) num_three_pts_attempts from game_boxscore gb inner join game_summary gs on gs.id = gb.game_id group by extract(year from gs.date), gb.game_id, gb.team_id) select   calendar_year,   round(avg(num_three_pts_attempts), 1) avg_nb_3pt_attempts from attempts_per_game where calendar_year between 2010 and 2015 group by calendar_year order by calendar_year;",
+        "expected_result": [{"calendar_year":2010,"avg_nb_3pt_attempts":18.3},{"calendar_year":2011,"avg_nb_3pt_attempts":18.0},{"calendar_year":2012,"avg_nb_3pt_attempts":18.8},{"calendar_year":2013,"avg_nb_3pt_attempts":20.5},{"calendar_year":2014,"avg_nb_3pt_attempts":21.9},{"calendar_year":2015,"avg_nb_3pt_attempts":23.2}]
     },
 
     {
