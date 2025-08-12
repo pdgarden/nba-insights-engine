@@ -154,3 +154,6 @@ cython_debug/
 
 # IDE
 .vscode/*
+
+# Other
+dev_tmp/
