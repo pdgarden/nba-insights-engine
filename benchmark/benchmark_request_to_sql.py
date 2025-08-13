@@ -251,7 +251,11 @@ def get_table_description(table_name: str) -> str:
 
 def get_db_description() -> str:
     """Database description in natural language to be used by the LLM."""
-    tables_names = [e[0] for e in DB_CONNECTOR.sql("select table_name from information_schema.tables").fetchall()]
+    tables_names = [
+        e[0]
+        for e in DB_CONNECTOR.sql("select table_name from information_schema.tables").fetchall()
+        if not e[0].startswith("base_")  # These tables should not be in the final db
+    ]
     tables_desc = {table: get_table_description(table) for table in tables_names}
     return "\n\n".join(tables_desc.values())
 
