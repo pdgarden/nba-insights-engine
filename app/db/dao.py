@@ -25,7 +25,11 @@ def get_table_columns(table_name: str) -> list[str, str]:
 
 def get_tables() -> list[str]:
     """Retrieve list of tables available in the database."""
-    return [e[0] for e in con.sql("select table_name from information_schema.tables").fetchall()]
+    return [
+        e[0]
+        for e in con.sql("select table_name from information_schema.tables").fetchall()
+        if not e[0].startswith("base_")  # These tables should not be in the final db
+    ]
 
 
 def sql_to_df(sql_query: str) -> pd.DataFrame:
