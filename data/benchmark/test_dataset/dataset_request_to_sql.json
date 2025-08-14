@@ -92,7 +92,7 @@
     },
 
     {
-        "question":"What is the average number of three point attempts for the entire team per game, for every calendar year between 2010 and 2015 included ? Return the column calendar_year and avg_nb_3pt_attempts rounded to 0,1.",
+        "question":"What is the average total number of three point attempts for the entire team per game, for every calendar year between 2010 and 2015 included ? Return the column calendar_year and avg_nb_3pt_attempts rounded to 0,1.",
         "num_tables_involved":2,
         "sql_query":"with attempts_per_game as ( select extract(year from gs.date) calendar_year, gb.game_id, gb.team_id, sum(three_pts_attempts) num_three_pts_attempts from game_boxscore gb inner join game_summary gs on gs.id = gb.game_id group by extract(year from gs.date), gb.game_id, gb.team_id) select   calendar_year,   round(avg(num_three_pts_attempts), 1) avg_nb_3pt_attempts from attempts_per_game where calendar_year between 2010 and 2015 group by calendar_year order by calendar_year;",
         "expected_result": [{"calendar_year":2010,"avg_nb_3pt_attempts":18.3},{"calendar_year":2011,"avg_nb_3pt_attempts":18.0},{"calendar_year":2012,"avg_nb_3pt_attempts":18.8},{"calendar_year":2013,"avg_nb_3pt_attempts":20.5},{"calendar_year":2014,"avg_nb_3pt_attempts":21.9},{"calendar_year":2015,"avg_nb_3pt_attempts":23.2}]
@@ -100,16 +100,48 @@
 
     {
         "question":"Which player scored the most number of points in average per season for each year between 2005 and 2007 ? Return the column season_start_year, player_name and avg_points (rounded to 0,2), order by season_start_year.",
-        "num_tables_involved":"TODO",
+        "num_tables_involved":4,
         "sql_query":"WITH player_rank AS ( SELECT p.player_name, round(ps.avg_points, 1) avg_points, s.start_year, ROW_NUMBER() over (partition by s.start_year order by ps.avg_points desc ) scoring_rank  FROM player_season ps JOIN player p ON ps.player_id = p.id JOIN season s ON ps.season_id = s.id WHERE s.start_year BETWEEN 2005 AND 2007 )  SELECT player_rank.player_name, player_rank.avg_points, player_rank.start_year, FROM player_rank WHERE player_rank.scoring_rank = 1 ORDER BY player_rank.start_year",
         "expected_result": [{"season_start_year": 2005, "player_name": "Kobe Bryant", "avg_points": 35.4}, {"season_start_year": 2006, "player_name": "Kobe Bryant", "avg_points": 31.56}, {"season_start_year": 2007, "player_name": "LeBron James", "avg_points": 30.0}]
     },
 
     {
         "question":"Retrieve the top 5 teams of the season starting in 2022 by winning percentage. Return only the column team_name",
-        "num_tables_involved":"TODO",
+        "num_tables_involved":3,
         "sql_query":"SELECT t.team_name FROM team t JOIN team_season ts ON t.id = ts.team_id JOIN season s ON ts.season_id = s.id WHERE s.start_year= 2022 ORDER BY pct_game_win DESC LIMIT 5;",
         "expected_result": [{"team_name": "Milwaukee Bucks"}, {"team_name": "Boston Celtics"}, {"team_name": "Philadelphia 76ers"}, {"team_name": "Denver Nuggets"}, {"team_name": "Memphis Grizzlies"}]
+    },
+
+
+    {
+        "question": "How many games did Kevin Love scored with at least 20 points during his rookie season ? Retrieve only the column nb_games",
+        "num_tables_involved": 5,
+        "sql_query": "with first_year as ( select min(start_year) as season_start_year from game_boxscore gbs inner join player p on p.id = gbs.player_id inner join game_summary gs on gs.id = gbs.game_id inner join season s on s.id = gs.season_id where p.player_name like 'Kevin Love') select count(*) nb_games from game_boxscore gbs inner join player p on p.id = gbs.player_id inner join game_summary gs on gs.id = gbs.game_id inner join season s on s.id = gs.season_id inner join first_year on first_year.season_start_year = s.start_year where p.player_name like 'Kevin Love' and points >= 20",
+        "expected_result":[{"nb_games": 6}]
+    },
+
+
+    {
+        "question": "What is the maxiumum number of points scored by Damian Lillard in a single game during his first season ? Only retrieve the column max_points",
+        "num_tables_involved": 5,
+        "sql_query": "with first_year as (   select min(start_year) as season_start_year   from game_boxscore gbs   inner join player p on p.id = gbs.player_id   inner join game_summary gs on gs.id = gbs.game_id   inner join season s on s.id = gs.season_id   where p.player_name like 'Damian Lillard' )  select max(points) max_points from game_boxscore gbs inner join player p on p.id = gbs.player_id   inner join game_summary gs on gs.id = gbs.game_id inner join season s on s.id = gs.season_id inner join first_year on first_year.season_start_year = s.start_year where p.player_name like 'Damian Lillard'",
+        "expected_result": [{"max_points": 38}]
+    },
+
+
+    {
+        "question": "Who are the 3 players with the most triple double during the season whose start year is 2022 ? Return the column player_name and num_triple_double ordered by num_triple_double in descending order.",
+        "num_tables_involved": 4,
+        "sql_query": "select p.player_name player_name, count(*) num_triple_double from game_boxscore gbs inner join player p on p.id = gbs.player_id inner join game_summary gs on gs.id = gbs.game_id inner join season s on s.id = gs.season_id where s.start_year = 2022   and (((total_rebounds >= 10)::int) + ((assists >= 10)::int) + ((steals >= 10)::int) + ((blocks >= 10)::int) + ((points >= 10)::int)) >= 3 group by p.player_name order by count(*) desc limit 3",
+        "expected_result": [{"player_name": "Nikola Jokić", "num_triple_double": 39}, {"player_name": "Domantas Sabonis", "num_triple_double": 14}, {"player_name": "Luka Dončić", "num_triple_double": 10}]
+    },
+
+
+    {
+        "question": "How many triple doubles did James Harden do during the 2022 calendar season ? Return only the column num_triple_double.",
+        "num_tables_involved": 4,
+        "sql_query": "select count(*) num_triple_double from game_boxscore gbs inner join player p on p.id = gbs.player_id inner join game_summary gs on gs.id = gbs.game_id inner join season s on s.id = gs.season_id where extract(year from gs.date) == 2022   and (((total_rebounds >= 10)::int) + ((assists >= 10)::int) + ((steals >= 10)::int) + ((blocks >= 10)::int) + ((points >= 10)::int)) >= 3   and p.player_name like 'James Harden'",
+        "expected_result": [{"num_triple_double": 6}]
     }
 
 ]
