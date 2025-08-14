@@ -135,16 +135,16 @@ For each benchmark, a small test set was created and a bunch of models were test
 
 | Model** | Accuracy (no thinking prompt) | Accuracy (thinking prompt) |
 | - | - | - |
-| deepseek/deepseek-chat-v3-0324:free | 85% | 80% |
-| moonshotai/kimi-k2:free | 80% | 85% |
-| qwen/qwen3-coder:free | 80% | 70% |
-| meta-llama/llama-3.3-70b-instruct:free | 65% | 60% |
-| qwen/qwen-2.5-72b-instruct:free | 75% | 75% |
-| moonshotai/kimi-dev-72b:free | 70% | 75% |
-| z-ai/glm-4.5-air:free | 75% | 75% |
-| qwen/qwen-2.5-coder-32b-instruct:free | 55% | 75% |
-| mistralai/mistral-small-3.2-24b-instruct:free | 60% | 60% |
-| openai/gpt-oss-20b:free | 85% | 90% |
+| deepseek/deepseek-chat-v3-0324 | 85% | 80% |
+| moonshotai/kimi-k2 | 80% | 85% |
+| qwen/qwen3-coder | 80% | 70% |
+| meta-llama/llama-3.3-70b-instruct | 65% | 60% |
+| qwen/qwen-2.5-72b-instruct | 75% | 75% |
+| moonshotai/kimi-dev-72b | 70% | 75% |
+| z-ai/glm-4.5-air | 75% | 75% |
+| qwen/qwen-2.5-coder-32b-instruct | 55% | 75% |
+| mistralai/mistral-small-3.2-24b-instruct | 60% | 60% |
+| openai/gpt-oss-20b | 85% | 90% |
 | hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL | 40% | 75% |
 
 ** _Model name from OpenRouter except for Qwen3-30B-A3B._
