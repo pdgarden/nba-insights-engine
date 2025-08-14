@@ -262,22 +262,26 @@ For each benchmark, a small test set was created and a bunch of models were test
 
 # 8. Improvements
 
-- Move duckdb database to cloud (e.g. motherduck)
-- Increase dataset's timeframe (Right now from 1999 to 2024)
-- Handle `OPENROUTER_API_KEY` through .env file in the benchmark scripts
-- Handle TODO tags
-- Add retry mechanism on llm calls (when retrieve null value or incorrect SQL query)
-- Try autoencoders like BERT for ner_retrieval_pipeline
-- Display plot based on generated result
-- Better error handling
-- Improve test to sql benchmark: add more queries and tag the queries with the difficulty level
+- Dataset
+  - Increase dataset's timeframe (Right now from 1999 to 2024)
+  - Move duckdb database to cloud (e.g. motherduck)
+- App
+  - Handle TODO tags
+  - Add retry mechanism on llm calls (when retrieve null value or incorrect SQL query)
+  - Display plot based on generated result
+  - Better error handling
 - Improve text to SQL results:
-  - Test agent to generate sql requests
   - Test intermediate step to generate sql request by filtering the columns / tables to use
-  - Test other models
-  - Test every models with thinking prompt
   - Add reflection step on result with possible modification
-
+  - Inject prompt in system message instead of user message
+  - Generate several responses
+  - Improve the prompt
+    - Add example values for each column
+    - Add a description for each column
+    - Include only a subset of tables/columns in the prompt (for 2 steps query creation)
+    - Add example of CTEs (Common Table Expressions) or mentions if needed
+    - Include examples
+    - Avoid requiring the thinking process to be wrapped in tags
 
 
 # 9. Complementary documentation
