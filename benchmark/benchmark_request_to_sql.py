@@ -13,7 +13,7 @@ from typing import Any, Callable
 import duckdb
 from loguru import logger
 from openai import OpenAI
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, computed_field, field_serializer
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Models
@@ -27,13 +27,22 @@ class TestCase(BaseModel):
 class TestCaseResult(BaseModel):
     question: str
     expected_result: Any
-    computed_result: Any
     llm_response: str
     computed_sql_query: str
+    computed_result: Any
 
     @computed_field
     def is_correct(self) -> bool:
         return self.expected_result == self.computed_result
+
+    # Only display subset of results to avoid too long messages
+    @field_serializer("computed_result")
+    def serialize_computed_result(self, computed_result: Any) -> str:
+        return str(computed_result)[:200] + ("..." if len(str(computed_result)) > 200 else "")
+
+    @field_serializer("expected_result")
+    def serialize_expected_result(self, expected_result: Any) -> str:
+        return str(expected_result)[:200] + ("..." if len(str(expected_result)) > 200 else "")
 
 
 class BenchmarkTestResults(BaseModel):
@@ -73,44 +82,68 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 # Models
 LLM_MODELS = [
-    # LLMConnection(
-    #     model_id="mistralai/mistral-small-24b-instruct-2501:free",
-    #     base_url="https://openrouter.ai/api/v1",
-    #     api_key=OPENROUTER_API_KEY,
-    # ),
-    # LLMConnection(
-    #     model_id="nvidia/llama-3.1-nemotron-70b-instruct:free",
-    #     base_url="https://openrouter.ai/api/v1",
-    #     api_key=OPENROUTER_API_KEY,
-    # ),
-    # LLMConnection(
-    #     model_id="meta-llama/llama-3.3-70b-instruct:free",
-    #     base_url="https://openrouter.ai/api/v1",
-    #     api_key=OPENROUTER_API_KEY,
-    # ),
-    # LLMConnection(
-    #     model_id="deepseek/deepseek-chat:free",
-    #     base_url="https://openrouter.ai/api/v1",
-    #     api_key=OPENROUTER_API_KEY,
-    # ),
     LLMConnection(
         model_id="hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL",
         base_url="http://localhost:11434/v1",
+        api_key="ollama",
+    ),
+    LLMConnection(
+        model_id="deepseek/deepseek-chat-v3-0324:free",
+        base_url="https://openrouter.ai/api/v1",
         api_key=OPENROUTER_API_KEY,
     ),
     LLMConnection(
-        model_id="hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL",
-        base_url="http://localhost:11434/v1",
+        model_id="moonshotai/kimi-k2:free",
+        base_url="https://openrouter.ai/api/v1",
         api_key=OPENROUTER_API_KEY,
     ),
-
+    LLMConnection(
+        model_id="qwen/qwen3-coder:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    ),
+    LLMConnection(
+        model_id="meta-llama/llama-3.3-70b-instruct:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    ),
+    LLMConnection(
+        model_id="qwen/qwen-2.5-72b-instruct:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    ),
+    LLMConnection(
+        model_id="moonshotai/kimi-dev-72b:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    ),
+    LLMConnection(
+        model_id="z-ai/glm-4.5-air:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    ),
+    LLMConnection(
+        model_id="qwen/qwen-2.5-coder-32b-instruct:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    ),
+    LLMConnection(
+        model_id="mistralai/mistral-small-3.2-24b-instruct:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    ),
+    LLMConnection(
+        model_id="openai/gpt-oss-20b:free",
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    ),
 ]
 
 
 # Other
 NB_RETRY = 3
-DELAY_BETWEEN_RETRY = 20
-DELAY_BETWEEN_REQUESTS = 20
+DELAY_BETWEEN_RETRY = 25
+DELAY_BETWEEN_REQUESTS = 5
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -210,22 +243,37 @@ The SQL request that you'll generate will need to work effectively with the datb
 # Functions
 
 
-def retry_on_null(nb_retry: int, delay: int = 1) -> Callable:
-    """Retries a function n if it returns None or an empty string."""
+def retry(
+    nb_retry: int,
+    delay: int = 1,
+) -> Callable:
+    """Retries a function if it returns None, an empty string or raise an error."""
 
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
             attempts = 0
             while attempts < nb_retry:
-                result = func(*args, **kwargs)
-                if result not in (None, ""):
-                    return result
-                attempts += 1
-                logger.error(f"Function: {func.__name__} retrieved None. Retrying ({attempts}/{nb_retry})...")
+                try:
+                    result = func(*args, **kwargs)
+
+                except Exception as exc:
+                    logger.warning(f"Function: {func.__name__} retrieved exception: {exc}")
+                    attempts += 1
+
+                else:
+                    if result not in (None, ""):
+                        return result
+
+                    attempts += 1
+                    logger.warning(f"Function: {func.__name__} retrieved None or empty string")
+
+                logger.warning(f"Retrying ({attempts}/{nb_retry})...")
                 time.sleep(delay)
             logger.error(f"Function: {func.__name__} still retrieved None after {nb_retry} attempts. Returning None.")
-            return None  # If all attempts fail, return None
+
+            error_msg = f"Function: {func.__name__} to retrieve a correct value"
+            raise ValueError(error_msg)
 
         return wrapper
 
@@ -260,7 +308,7 @@ def get_db_description() -> str:
     return "\n\n".join(tables_desc.values())
 
 
-@retry_on_null(nb_retry=NB_RETRY, delay=DELAY_BETWEEN_RETRY)
+@retry(nb_retry=NB_RETRY, delay=DELAY_BETWEEN_RETRY)
 def query_llm(prompt: str, llm_model: LLMConnection) -> str:
     """Send query to the LLM."""
     llm_client = OpenAI(
