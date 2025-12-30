@@ -101,8 +101,6 @@ Here is a brief overview of the system:
 <img src="assets/images/app_pipeline.png" alt="App workflow" style="border: 1px solid grey; border-radius: 8px;">
 
 
-For the Named Entity Recognition (NER) task, the system uses a LLM, but I am currently working on a fine-tuned auto-encoder model to replace it.
-
 # 5. Dataset
 
 The NBA database used is a duckdb database, generated using duckdb and dbt with this [repo](https://github.com/pdgarden/nba-stats).
@@ -119,12 +117,17 @@ For each benchmark, a small test set was created and a bunch of models were test
 
 **Name entity recognition and retrieval pipeline results:**
 
+The `pdesj/Llama-3.2-1B-nba-ner-GGUF:Q4_K_M` model is especially fine-tuned for this NER task, more information [here](https://huggingface.co/pdesj/Llama-3.2-1B-nba-ner-GGUF-Q4_K_M).
+
+
 | Model* | Accuracy  |
 |-------|---------- |
-| smollm2:360m | 0% |
-| llama3.2:3b | 90% |
-| mistral:7b | 60%  |
-| qwen2.5:7b | 100% |
+| llama3.2:1b | 20.0% |
+| llama3.2:3b | 10.0% |
+| mistral:7b | 70.0% |
+| qwen2.5:7b | 100.0% |
+| pdesj/Llama-3.2-1B-nba-ner-GGUF:Q4_K_M** | 100.0% |
+
 
 \* _Model name from ollama_
 
