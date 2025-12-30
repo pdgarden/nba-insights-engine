@@ -35,7 +35,7 @@ extend-select = [
     'E', 'F', 'W', 'C90', 'A', 'ANN', 'S', 'B', 'PT', 'Q', 'RSE', 'SIM', 'ARG', 'PTH', 'PD',
     'TRY', 'FLY', 'NPY', 'PLC', 'PLE', 'PLW', 'I',
     ]
-ignore = ['S608', 'ANN401']
+ignore = ['S608', 'ANN401', 'TRY301']
 
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/**/*.py" = ["S101"]

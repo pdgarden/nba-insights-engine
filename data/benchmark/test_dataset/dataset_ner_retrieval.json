@@ -98,7 +98,7 @@
         }
     },
     {
-        "request": "Which team had the best record in the Eastern Conference in 2021?",
+        "request": "What is the average number of points scored per game between 2000 and 2010 ?",
         "expected_raw_teams": [],
         "expected_raw_players": [],
         "expected_db_teams": {},
