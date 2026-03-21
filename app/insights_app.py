@@ -9,7 +9,7 @@ from app.constants import MAX_NUM_VALUES_NATURAL_LANGUAGE_TO_TABLE_THRESHOLD
 from app.db.dao import sql_to_df
 from app.logic.ner_retrieval import replace_names_in_text
 from app.logic.question_to_sql import generate_sql_query
-from app.logic.results_display import generate_question_response_md
+from app.logic.results_display import generate_chart_decision, generate_question_response_md, render_chart
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Layout
@@ -38,8 +38,22 @@ if input_trigger:
     tab_inspection.dataframe(sql_query_result)
 
     num_values = sql_query_result.shape[0] * sql_query_result.shape[1]
+
+    # Display natural language response or raw dataframe
     if num_values < MAX_NUM_VALUES_NATURAL_LANGUAGE_TO_TABLE_THRESHOLD:
         response_md = generate_question_response_md(question=clean_question, result=sql_query_result)
         tab_result.markdown(response_md)
     else:
         tab_result.dataframe(sql_query_result)
+
+        # Get chart decision from LLM
+        chart_decision = generate_chart_decision(
+            user_query=clean_question,
+            sql_query=sql_query,
+            df=sql_query_result,
+        )
+
+        # Display chart if LLM recommends it
+        if chart_decision.chart is not False:
+            fig = render_chart(sql_query_result, chart_decision.chart)
+            tab_result.plotly_chart(fig, use_container_width=True)
