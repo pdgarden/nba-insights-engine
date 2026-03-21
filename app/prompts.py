@@ -106,3 +106,88 @@ Here is the text to process:
 
 {text}.
 """
+
+
+CHART_CONFIG = """
+# Task
+A user asks you a question about NBA. You used a SQL query to retrieve data from the database, resulting in a dataframe.
+
+You must create a graph to visualize the data. Generate the configuration for the graph.
+If the data is not suitable for visualization, return False for the chart field.
+
+
+# Chart Selection Guidelines
+
+## Decision Priority (apply in this order)
+
+1. **Two or more numerical metrics?** → SCATTER (default choice)
+   - When data contains 2+ numerical columns (points, assists, rebounds, etc.)
+   - Shows correlation, trade-offs, distribution between metrics
+   - Exception: Only use LINE if the question explicitly asks about trends/changes over time (e.g., "how did X change \
+     over years", "trend of", "progression")
+
+2. **Time/sequence variable + single metric?** → LINE
+   - Tracking changes over time with one main value
+
+3. **Categories + values?** → BAR
+
+
+Choose a chart type based on the data and the user's question:
+
+1. **LINE CHART** - Use when:
+   - X-axis represents time or a sequential/ordinal variable (dates, game numbers, quarters)
+   - You want to show trends or changes over time
+   - Multiple lines can compare different groups/teams/players over the same time period
+   - The question asks "how X changed over time", "trend", "progression"
+   - Example: "How has Stephen Curry's 3-point percentage changed over the seasons?"
+   - Example: "Stats for each season" → line shows career trajectory
+
+**LINE vs SCATTER when you have time + 2 metrics:**
+- Use LINE if the question is about trends over time (how did stats change?)
+- Use SCATTER if the question is about correlation between the two metrics (how do points relate to assists?)
+
+2. **SCATTER PLOT** - Use when:
+   - Both X and Y axes are numerical/continuous variables
+   - You want to show correlation, distribution, or clustering
+   - Each point represents an independent observation (game, player, team, season)
+   - You can use color/size/symbol to encode additional dimensions
+   - Example: "What's the relationship between usage rate and efficiency?" or "Show me the trade-off between points /
+     and assists"
+   - Example: "Average points and assists per player" → scatter shows the correlation between the two metrics
+   - Example: "Points and assists for each season for LeBron James" → scatter with x=avg_points, y=avg_assists, each /
+     point=one season
+
+3. **BAR CHART** - Use when:
+   - X-axis represents categories (team names, player names, positions, discrete bins)
+   - You want to compare values across categories
+   - Showing rankings or top-N lists
+   - Example: "Which teams have the most wins?" or "Top 10 scorers this season"
+
+Return False when:
+- The result is a single aggregate value with no meaningful visualization
+- The data has too many rows to be meaningfully plotted (>1000 points for line/scatter)
+- The data has too many categories for a bar chart (>20 bars)
+
+
+# Important: Identifiers vs Analysis Variables
+
+When selecting a chart, distinguish between:
+- **Identifier columns** (player_name, team_name, player_id, game_id) — these are labels that identify rows
+- **Analysis variables** (numerical metrics, statistics, counts) — these are the values you analyze
+
+**For scatter plots:** Identifier columns should be used for tooltips/labels, NOT as x/y axes. \
+Use two numerical analysis variables as axes.
+**Clue words for scatter/correlation:** "relationship", "vs", "and" between two metrics, \
+"correlation", "how X relates to Y"
+
+
+# Data:
+- User question: {user_query}
+- SQL query: {sql_query}
+- Dataframe shape: {df_shape}
+- Dataframe columns and types: {df_dtypes}
+
+
+# Output format
+You must output a JSON object matching the following structure: {output_json_schema}
+"""
