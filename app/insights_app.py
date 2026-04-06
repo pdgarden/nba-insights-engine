@@ -12,6 +12,12 @@ from app.logic.question_to_sql import generate_sql_query
 from app.logic.results_display import generate_chart_decision, generate_question_response_md, render_chart
 
 # -------------------------------------------------------------------------------------------------------------------- #
+# Config
+
+st.set_page_config(layout="wide")
+
+
+# -------------------------------------------------------------------------------------------------------------------- #
 # Layout
 
 input_question = st.text_area(
@@ -37,15 +43,17 @@ if input_trigger:
     sql_query_result = sql_to_df(sql_query)
     tab_inspection.dataframe(sql_query_result)
 
+    results_placeholder = tab_result.empty()
+    results_placeholder.dataframe(sql_query_result)
+
     num_values = sql_query_result.shape[0] * sql_query_result.shape[1]
 
     # Display natural language response or raw dataframe
     if num_values < MAX_NUM_VALUES_NATURAL_LANGUAGE_TO_TABLE_THRESHOLD:
         response_md = generate_question_response_md(question=clean_question, result=sql_query_result)
-        tab_result.markdown(response_md)
+        with results_placeholder.container():
+            st.markdown(response_md)
     else:
-        tab_result.dataframe(sql_query_result)
-
         # Get chart decision from LLM
         chart_decision = generate_chart_decision(
             user_query=clean_question,
@@ -56,4 +64,7 @@ if input_trigger:
         # Display chart if LLM recommends it
         if chart_decision.chart is not False:
             fig = render_chart(sql_query_result, chart_decision.chart)
-            tab_result.plotly_chart(fig, use_container_width=True)
+            with results_placeholder.container():
+                tab_table, tab_chart = st.tabs(["Table", "Chart"])
+                tab_table.dataframe(sql_query_result)
+                tab_chart.plotly_chart(fig, use_container_width=True)
