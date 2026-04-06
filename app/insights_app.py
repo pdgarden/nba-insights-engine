@@ -63,8 +63,12 @@ if input_trigger:
 
         # Display chart if LLM recommends it
         if chart_decision.chart is not False:
-            fig = render_chart(sql_query_result, chart_decision.chart)
-            with results_placeholder.container():
-                tab_table, tab_chart = st.tabs(["Table", "Chart"])
-                tab_table.dataframe(sql_query_result)
-                tab_chart.plotly_chart(fig, use_container_width=True)
+            try:
+                fig = render_chart(sql_query_result, chart_decision.chart)
+                with results_placeholder.container():
+                    tab_table, tab_chart = st.tabs(["Table", "Chart"])
+                    tab_table.dataframe(sql_query_result)
+                    tab_chart.plotly_chart(fig, use_container_width=True)
+            except Exception as e:
+                st.warning(f"Could not generate chart: {e}")
+                results_placeholder.dataframe(sql_query_result)

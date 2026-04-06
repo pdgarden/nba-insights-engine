@@ -11,7 +11,7 @@ import plotly.express as px
 from plotly.graph_objects import Figure
 from pydantic import BaseModel, Field
 
-from app.constants import CHART_HEIGHT, CHART_WIDTH
+from app.constants import CHART_HEIGHT, CHART_TEMPLATE, CHART_WIDTH
 from app.llm import query_llm
 from app.prompts import CHART_CONFIG
 
@@ -122,16 +122,29 @@ def render_chart(df: pd.DataFrame, chart_config: ChartConfig) -> Figure:
         error_msg = f"Unknown chart type: {type_config.chart_type}"
         raise ValueError(error_msg) from exc
 
+    # Build common chart arguments
+    chart_kwargs = {
+        "data_frame": df,
+        "x": type_config.x_col,
+        "y": type_config.y_col,
+        "color": type_config.color_col,
+        "hover_data": df.columns,
+        "width": CHART_WIDTH,
+        "height": CHART_HEIGHT,
+        "template": CHART_TEMPLATE,
+    }
+
+    # Add chart-type specific arguments
+    if isinstance(type_config, ScatterChartConfig):
+        if type_config.size_col:
+            chart_kwargs["size"] = type_config.size_col
+        if type_config.symbol_col:
+            chart_kwargs["symbol"] = type_config.symbol_col
+    elif isinstance(type_config, BarChartConfig) and type_config.orientation:
+        chart_kwargs["orientation"] = type_config.orientation
+
     # Create the chart
-    chart = chart_function(
-        data_frame=df,
-        x=type_config.x_col,
-        y=type_config.y_col,
-        color=type_config.color_col,
-        hover_data=df.columns,
-        width=CHART_WIDTH,
-        height=CHART_HEIGHT,
-    ).update_layout(
+    chart = chart_function(**chart_kwargs).update_layout(
         title=common_config.title,
         xaxis_title=common_config.x_axis_label,
         yaxis_title=common_config.y_axis_label,
