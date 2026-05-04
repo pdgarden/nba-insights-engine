@@ -77,7 +77,7 @@ OUTPUT_BENCHMARK_PATH = (
 
 
 # Credentials
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
 
 
 # Models
@@ -258,7 +258,8 @@ def retry(
                     result = func(*args, **kwargs)
 
                 except Exception as exc:
-                    logger.warning(f"Function: {func.__name__} retrieved exception: {exc}")
+                    func_name = func.__name__  # ty:ignore[unresolved-attribute]
+                    logger.warning(f"Function: {func_name} retrieved exception: {exc}")
                     attempts += 1
 
                 else:
@@ -266,13 +267,13 @@ def retry(
                         return result
 
                     attempts += 1
-                    logger.warning(f"Function: {func.__name__} retrieved None or empty string")
+                    logger.warning(f"Function: {func_name} retrieved None or empty string")
 
                 logger.warning(f"Retrying ({attempts}/{nb_retry})...")
                 time.sleep(delay)
-            logger.error(f"Function: {func.__name__} still retrieved None after {nb_retry} attempts. Returning None.")
+            logger.error(f"Function: {func_name} still retrieved None after {nb_retry} attempts. Returning None.")
 
-            error_msg = f"Function: {func.__name__} to retrieve a correct value"
+            error_msg = f"Function: {func_name} to retrieve a correct value"
             raise ValueError(error_msg)
 
         return wrapper
@@ -309,7 +310,7 @@ def get_db_description() -> str:
 
 
 @retry(nb_retry=NB_RETRY, delay=DELAY_BETWEEN_RETRY)
-def query_llm(prompt: str, llm_model: LLMConnection) -> str:
+def query_llm(prompt: str, llm_model: LLMConnection) -> str | None:
     """Send query to the LLM."""
     llm_client = OpenAI(
         base_url=llm_model.base_url,
