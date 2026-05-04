@@ -107,7 +107,7 @@ def generate_chart_decision(user_query: str, sql_query: str, df: pd.DataFrame) -
     )
 
     # Query the LLM with structured output
-    return query_llm(prompt=prompt, model_kind="light", structured_output=ChartDecision)
+    return query_llm(prompt=prompt, model_kind="heavy", structured_output=ChartDecision)
 
 
 def render_chart(df: pd.DataFrame, chart_config: ChartConfig) -> Figure:
