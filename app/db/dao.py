@@ -13,7 +13,7 @@ def get_teams_names() -> list[str]:
     return [e[0] for e in con.sql("select distinct team_name from team").fetchall()]
 
 
-def get_table_columns(table_name: str) -> list[str, str]:
+def get_table_columns(table_name: str) -> list[tuple[str, str]]:
     """Retrieve list of columns name and type for a given table."""
     return [
         e

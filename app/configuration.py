@@ -1,5 +1,5 @@
 from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Config(BaseSettings):
@@ -9,7 +9,7 @@ class Config(BaseSettings):
     )
     light_llm_api_key: SecretStr = Field(
         description="API key to connect to the light LLM API. Used through OpenAI SDK.",
-        default="ollama",
+        default=SecretStr("ollama"),
     )
     light_llm_model: str = Field(
         description="Name of light LLM model used. Used through OpenAI SDK.",
@@ -21,6 +21,7 @@ class Config(BaseSettings):
         default="https://openrouter.ai/api/v1",
     )
     heavy_llm_api_key: SecretStr = Field(
+        ...,
         description="API key to connect to the heavy LLM API. Used through OpenAI SDK.",
     )
 
@@ -29,5 +30,7 @@ class Config(BaseSettings):
         default="meta-llama/llama-3.3-70b-instruct:free",
     )
 
+    model_config = SettingsConfigDict(env_file=".env")
 
-config = Config(_env_file=".env")
+
+config = Config()
