@@ -5,6 +5,16 @@ repos:
   hooks:
     - id: check-yaml
 
+
+- repo: local
+  hooks:
+    - id: ty-check
+      name: Run ty type checker
+      entry: uv run ty check
+      language: system
+      types: [python]
+      pass_filenames: false  # ty does not need filenames as arguments
+
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.9.7
   hooks:
