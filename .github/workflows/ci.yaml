@@ -2,13 +2,32 @@ name: CI # Linter / Unit Tests
 on: [ push ]
 
 jobs:
-  ruff:
+  static_check:
+    name: Lint and Typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: chartboost/ruff-action@v1
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          version: 0.9.7
+          version: "0.5.10"
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Typecheck
+        run: uv run ty check .
+
+      - name: Lint
+        run: uv run ruff check .
 
 
   test:
