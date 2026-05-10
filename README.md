@@ -258,7 +258,7 @@ The `pdesj/Llama-3.2-1B-nba-ner-GGUF:Q4_K_M` model is especially fine-tuned for 
 # 7 Code Quality and Formatting
 
 - The python files are linted and formatted using ruff, see configuration in `pyproject.toml`
-- Pre-commit configuration is available to ensure trigger quality checks (e.g. linter)
+- Pre-commit configuration is available to ensure trigger quality checks (e.g. linter, typechecking)
 - Commit messages follow the conventional commit convention
 - A CI/CD pipeline is implemented with github actions to lint the code
 
