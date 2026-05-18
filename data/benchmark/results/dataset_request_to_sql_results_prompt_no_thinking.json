@@ -166,6 +166,172 @@
         "accuracy": 0.4
     },
     {
+        "llm_model": "unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_XL",
+        "test_cases_results": [
+            {
+                "question": "Which player_id played the highest number of games with at least 20 points in the game ? Retrieve only the player_id.",
+                "expected_result": "[{'player_id': '5d840cd3c34bddb0032e549468dc93944709b9c35bf4669db3628e29e7f8ef3c'}]",
+                "llm_response": "```sql\nSELECT player_id\nFROM game_boxscore\nWHERE points >= 20\nGROUP BY player_id\nORDER BY COUNT(*) DESC\nLIMIT 1;\n```",
+                "computed_sql_query": "\nSELECT player_id\nFROM game_boxscore\nWHERE points >= 20\nGROUP BY player_id\nORDER BY COUNT(*) DESC\nLIMIT 1;\n",
+                "computed_result": "[{'player_id': '5d840cd3c34bddb0032e549468dc93944709b9c35bf4669db3628e29e7f8ef3c'}]",
+                "is_correct": true
+            },
+            {
+                "question": "Which player_id scored the highest number of points in a game? Retrieve the player id and the number of points scored.",
+                "expected_result": "[{'player_id': '172f44a95b6cb6f06d77fd7ccf9a254065b1416d3a82e2fb74ea465089600fb6', 'points': 81}]",
+                "llm_response": "```sql\nselect player_id, points\nfrom game_boxscore\norder by points desc\nlimit 1\n```",
+                "computed_sql_query": "\nselect player_id, points\nfrom game_boxscore\norder by points desc\nlimit 1\n",
+                "computed_result": "[{'player_id': '172f44a95b6cb6f06d77fd7ccf9a254065b1416d3a82e2fb74ea465089600fb6', 'points': 81}]",
+                "is_correct": true
+            },
+            {
+                "question": "What is highest number of points scored in a single game by a team, eitheir playing at home or away ? Retrieve only the number named max_score.",
+                "expected_result": "[{'max_score': 176}]",
+                "llm_response": "```sql\nSELECT MAX(GREATEST(home_team_points, away_team_points)) AS max_score\nFROM game_summary\n```",
+                "computed_sql_query": "\nSELECT MAX(GREATEST(home_team_points, away_team_points)) AS max_score\nFROM game_summary\n",
+                "computed_result": "[{'max_score': 176.0}]",
+                "is_correct": true
+            },
+            {
+                "question": "What is highest number of blocks made by a player in a single game ? Return only the number named max_blocks.",
+                "expected_result": "[{'max_blocks': 12}]",
+                "llm_response": "```sql\nSELECT MAX(blocks) AS max_blocks\nFROM game_boxscore\n```",
+                "computed_sql_query": "\nSELECT MAX(blocks) AS max_blocks\nFROM game_boxscore\n",
+                "computed_result": "[{'max_blocks': 12}]",
+                "is_correct": true
+            },
+            {
+                "question": "What is the highest winning percentage by a team in a season (precision to 0.01%, e.g. 11.22%)? Return the result in percentage, scaled between 0 and 100 and name it max_pct_game_win.",
+                "expected_result": "[{'max_pct_game_win': 89.02}]",
+                "llm_response": "```sql\nSELECT MAX(pct_game_win) * 100 AS max_pct_game_win\nFROM team_season\n```",
+                "computed_sql_query": "\nSELECT MAX(pct_game_win) * 100 AS max_pct_game_win\nFROM team_season\n",
+                "computed_result": "[{'max_pct_game_win': 89.02439024390245}]",
+                "is_correct": false
+            },
+            {
+                "question": "What is the difference between the average number of games scored by a home team and an away team (Rounded to 0,1). Return only the number, named avg_diff.",
+                "expected_result": "[{'avg_diff': 2.9}]",
+                "llm_response": "```sql\nSELECT ROUND(AVG(gs.home_team_points) - AVG(gs.away_team_points), 1) AS avg_diff\nFROM game_summary gs;\n```",
+                "computed_sql_query": "\nSELECT ROUND(AVG(gs.home_team_points) - AVG(gs.away_team_points), 1) AS avg_diff\nFROM game_summary gs;\n",
+                "computed_result": "[{'avg_diff': 2.9}]",
+                "is_correct": true
+            },
+            {
+                "question": "What is the average cumulated number of points (Rounded to 0,1) scored in a game depending if it is during regular season or not. Return the columns is_regular_season and avg_points, ordered by is_regular_season.",
+                "expected_result": "[{'is_regular_season': False, 'avg_points': 197.8}, {'is_regular_season': True, 'avg_points': 203.8}]",
+                "llm_response": "```sql\nSELECT \n    is_regular_season, \n    ROUND(AVG(home_team_points + away_team_points), 1) AS avg_points\nFROM game_summary\nGROUP BY is_regular_season\nORDER BY is_regular_season;\n```",
+                "computed_sql_query": "\nSELECT \n    is_regular_season, \n    ROUND(AVG(home_team_points + away_team_points), 1) AS avg_points\nFROM game_summary\nGROUP BY is_regular_season\nORDER BY is_regular_season;\n",
+                "computed_result": "[{'is_regular_season': False, 'avg_points': 197.8}, {'is_regular_season': True, 'avg_points': 203.8}]",
+                "is_correct": true
+            },
+            {
+                "question": "What is the highest number of points scored in a single game by LeBron James ? Return only the the number, named max_pts",
+                "expected_result": "[{'max_pts': 61}]",
+                "llm_response": "```sql\nSELECT MAX(gbs.points) AS max_pts\nFROM game_boxscore gbs\nJOIN player p ON gbs.player_id = p.id\nWHERE p.player_name = 'LeBron James'\n```",
+                "computed_sql_query": "\nSELECT MAX(gbs.points) AS max_pts\nFROM game_boxscore gbs\nJOIN player p ON gbs.player_id = p.id\nWHERE p.player_name = 'LeBron James'\n",
+                "computed_result": "[{'max_pts': 61}]",
+                "is_correct": true
+            },
+            {
+                "question": "Which player scored the highest number of points in a single game ? Return the player name as player_name, and the number of points as nb_points.",
+                "expected_result": "[{'player_name': 'Kobe Bryant', 'nb_points': 81}]",
+                "llm_response": "```sql\nselect p.player_name, gb.points as nb_points\nfrom game_boxscore gb\njoin player p on gb.player_id = p.id\norder by gb.points desc\nlimit 1\n```",
+                "computed_sql_query": "\nselect p.player_name, gb.points as nb_points\nfrom game_boxscore gb\njoin player p on gb.player_id = p.id\norder by gb.points desc\nlimit 1\n",
+                "computed_result": "[{'player_name': 'Kobe Bryant', 'nb_points': 81}]",
+                "is_correct": true
+            },
+            {
+                "question": "Which team scored the highest number of points in a single game while being the home team ? Return only the team name as team_name",
+                "expected_result": "[{'team_name': 'Los Angeles Clippers'}]",
+                "llm_response": "```sql\nSELECT t.team_name\nFROM game_summary gs\nJOIN team t ON gs.home_team_id = t.id\nORDER BY gs.home_team_points DESC\nLIMIT 1;\n```",
+                "computed_sql_query": "\nSELECT t.team_name\nFROM game_summary gs\nJOIN team t ON gs.home_team_id = t.id\nORDER BY gs.home_team_points DESC\nLIMIT 1;\n",
+                "computed_result": "[{'team_name': 'Los Angeles Clippers'}]",
+                "is_correct": true
+            },
+            {
+                "question": "Which player scored the highest number of blocks in a single game ? If there is several players, return them all. Return the columns player_name and max_nb_blocks. Sort by player name.",
+                "expected_result": "[{'player_name': 'Hassan Whiteside', 'max_nb_blocks': 12}, {'player_name': 'JaVale McGee', 'max_nb_blocks': 12}, {'player_name': 'Keon Clark', 'max_nb_blocks': 12}]",
+                "llm_response": "```sql\nSELECT p.player_name, MAX(gb.blocks) AS max_nb_blocks\nFROM game_boxscore gb\nJOIN player p ON gb.player_id = p.id\nGROUP BY p.player_name\nHAVING MAX(gb.blocks) = (SELECT MAX(blocks) FROM game_boxscore)\nORDER BY p.player_name;\n```",
+                "computed_sql_query": "\nSELECT p.player_name, MAX(gb.blocks) AS max_nb_blocks\nFROM game_boxscore gb\nJOIN player p ON gb.player_id = p.id\nGROUP BY p.player_name\nHAVING MAX(gb.blocks) = (SELECT MAX(blocks) FROM game_boxscore)\nORDER BY p.player_name;\n",
+                "computed_result": "[{'player_name': 'Hassan Whiteside', 'max_nb_blocks': 12}, {'player_name': 'JaVale McGee', 'max_nb_blocks': 12}, {'player_name': 'Keon Clark', 'max_nb_blocks': 12}]",
+                "is_correct": true
+            },
+            {
+                "question": "How many games per season did LeBron James played in average between 2005 and 2015 included ? Return the column avg_nb_games rounded to 0,1.",
+                "expected_result": "[{'avg_nb_games': 75.3}]",
+                "llm_response": "```sql\nSELECT ROUND(AVG(ps.nb_games), 1) AS avg_nb_games\nFROM player p\nJOIN player_season ps ON p.id = ps.player_id\nJOIN season s ON ps.season_id = s.id\nWHERE p.player_name = 'LeBron James'\n  AND s.start_year BETWEEN 2005 AND 2015;\n```",
+                "computed_sql_query": "\nSELECT ROUND(AVG(ps.nb_games), 1) AS avg_nb_games\nFROM player p\nJOIN player_season ps ON p.id = ps.player_id\nJOIN season s ON ps.season_id = s.id\nWHERE p.player_name = 'LeBron James'\n  AND s.start_year BETWEEN 2005 AND 2015;\n",
+                "computed_result": "[{'avg_nb_games': 75.3}]",
+                "is_correct": true
+            },
+            {
+                "question": "What is the average number of three point attempts per player per game for every calendar years between 2005 and 2007 included ? Return the column calendar_year and avg_nb_3pt_attempts rounded to 0,1.",
+                "expected_result": "[{'calendar_year': 2005, 'avg_nb_3pt_attempts': 1.6}, {'calendar_year': 2006, 'avg_nb_3pt_attempts': 1.6}, {'calendar_year': 2007, 'avg_nb_3pt_attempts': 1.7}]",
+                "llm_response": "```sql\nSELECT \n    s.start_year AS calendar_year,\n    ROUND(AVG(gbs.three_pts_attempts), 1) AS avg_nb_3pt_attempts\nFROM game_boxscore gbs\nJOIN game_summary gs ON gbs.game_id = gs.id\nJOIN season s ON gs.season_id = s.id\nWHERE s.start_year BETWEEN 2005 AND 2007\nGROUP BY s.start_year\nORDER BY s.start_year;\n```",
+                "computed_sql_query": "\nSELECT \n    s.start_year AS calendar_year,\n    ROUND(AVG(gbs.three_pts_attempts), 1) AS avg_nb_3pt_attempts\nFROM game_boxscore gbs\nJOIN game_summary gs ON gbs.game_id = gs.id\nJOIN season s ON gs.season_id = s.id\nWHERE s.start_year BETWEEN 2005 AND 2007\nGROUP BY s.start_year\nORDER BY s.start_year;\n",
+                "computed_result": "[{'calendar_year': 2005, 'avg_nb_3pt_attempts': 1.6}, {'calendar_year': 2006, 'avg_nb_3pt_attempts': 1.7}, {'calendar_year': 2007, 'avg_nb_3pt_attempts': 1.8}]",
+                "is_correct": false
+            },
+            {
+                "question": "What is the average total number of three point attempts for the entire team per game, for every calendar year between 2010 and 2015 included ? Return the column calendar_year and avg_nb_3pt_attempts rounded to 0,1.",
+                "expected_result": "[{'calendar_year': 2010, 'avg_nb_3pt_attempts': 18.3}, {'calendar_year': 2011, 'avg_nb_3pt_attempts': 18.0}, {'calendar_year': 2012, 'avg_nb_3pt_attempts': 18.8}, {'calendar_year': 2013, 'avg_nb_3pt_a...",
+                "llm_response": "```sql\nSELECT \n    s.start_year AS calendar_year,\n    ROUND(AVG(gs_agg.total_3pt_attempts / gs_agg.nb_games), 1) AS avg_nb_3pt_attempts\nFROM (\n    SELECT \n        gs.season_id,\n        COUNT(DISTINCT gs.id) AS nb_games,\n        SUM(gbs.three_pts_attempts) AS total_3pt_attempts\n    FROM game_summary gs\n    JOIN game_boxscore gbs ON gs.id = gbs.game_id\n    WHERE gs.is_regular_season = TRUE\n    GROUP BY gs.season_id\n) gs_agg\nJOIN season s ON gs_agg.season_id = s.id\nWHERE s.start_year BETWEEN 2010 AND 2015\nGROUP BY s.start_year\nORDER BY s.start_year;\n```",
+                "computed_sql_query": "\nSELECT \n    s.start_year AS calendar_year,\n    ROUND(AVG(gs_agg.total_3pt_attempts / gs_agg.nb_games), 1) AS avg_nb_3pt_attempts\nFROM (\n    SELECT \n        gs.season_id,\n        COUNT(DISTINCT gs.id) AS nb_games,\n        SUM(gbs.three_pts_attempts) AS total_3pt_attempts\n    FROM game_summary gs\n    JOIN game_boxscore gbs ON gs.id = gbs.game_id\n    WHERE gs.is_regular_season = TRUE\n    GROUP BY gs.season_id\n) gs_agg\nJOIN season s ON gs_agg.season_id = s.id\nWHERE s.start_year BETWEEN 2010 AND 2015\nGROUP BY s.start_year\nORDER BY s.start_year;\n",
+                "computed_result": "[{'calendar_year': 2010, 'avg_nb_3pt_attempts': 36.0}, {'calendar_year': 2011, 'avg_nb_3pt_attempts': 36.8}, {'calendar_year': 2012, 'avg_nb_3pt_attempts': 39.9}, {'calendar_year': 2013, 'avg_nb_3pt_a...",
+                "is_correct": false
+            },
+            {
+                "question": "Which player scored the most number of points in average per season for each year between 2005 and 2007 ? Return the column season_start_year, player_name and avg_points (rounded to 0,2), order by season_start_year.",
+                "expected_result": "[{'season_start_year': 2005, 'player_name': 'Kobe Bryant', 'avg_points': 35.4}, {'season_start_year': 2006, 'player_name': 'Kobe Bryant', 'avg_points': 31.56}, {'season_start_year': 2007, 'player_name...",
+                "llm_response": "```sql\nSELECT \n    s.start_year AS season_start_year,\n    p.player_name,\n    ROUND(ps.avg_points, 2) AS avg_points\nFROM player_season ps\nJOIN player p ON ps.player_id = p.id\nJOIN season s ON ps.season_id = s.id\nWHERE s.start_year BETWEEN 2005 AND 2007\nORDER BY s.start_year;\n```",
+                "computed_sql_query": "\nSELECT \n    s.start_year AS season_start_year,\n    p.player_name,\n    ROUND(ps.avg_points, 2) AS avg_points\nFROM player_season ps\nJOIN player p ON ps.player_id = p.id\nJOIN season s ON ps.season_id = s.id\nWHERE s.start_year BETWEEN 2005 AND 2007\nORDER BY s.start_year;\n",
+                "computed_result": "[{'season_start_year': 2005, 'player_name': 'Aaron Miles', 'avg_points': 0.84}, {'season_start_year': 2005, 'player_name': 'Adrian Griffin', 'avg_points': 4.56}, {'season_start_year': 2005, 'player_na...",
+                "is_correct": false
+            },
+            {
+                "question": "Retrieve the top 5 teams of the season starting in 2022 by winning percentage. Return only the column team_name",
+                "expected_result": "[{'team_name': 'Milwaukee Bucks'}, {'team_name': 'Boston Celtics'}, {'team_name': 'Philadelphia 76ers'}, {'team_name': 'Denver Nuggets'}, {'team_name': 'Memphis Grizzlies'}]",
+                "llm_response": "```sql\nSELECT t.team_name\nFROM team t\nJOIN team_season ts ON t.id = ts.team_id\nJOIN season s ON ts.season_id = s.id\nWHERE s.start_year = 2022\nORDER BY ts.pct_game_win DESC\nLIMIT 5;\n```",
+                "computed_sql_query": "\nSELECT t.team_name\nFROM team t\nJOIN team_season ts ON t.id = ts.team_id\nJOIN season s ON ts.season_id = s.id\nWHERE s.start_year = 2022\nORDER BY ts.pct_game_win DESC\nLIMIT 5;\n",
+                "computed_result": "[{'team_name': 'Milwaukee Bucks'}, {'team_name': 'Boston Celtics'}, {'team_name': 'Philadelphia 76ers'}, {'team_name': 'Denver Nuggets'}, {'team_name': 'Memphis Grizzlies'}]",
+                "is_correct": true
+            },
+            {
+                "question": "How many games did Kevin Love scored with at least 20 points during his rookie season ? Retrieve only the column nb_games",
+                "expected_result": "[{'nb_games': 6}]",
+                "llm_response": "```sql\nSELECT COUNT(*) AS nb_games\nFROM game_boxscore gb\nJOIN player p ON gb.player_id = p.id\nJOIN game_summary gs ON gb.game_id = gs.id\nWHERE p.player_name = 'Kevin Love'\n  AND gs.season_id IN (\n    SELECT ps.season_id\n    FROM player_season ps\n    WHERE ps.player_id = p.id\n    ORDER BY ps.season_id ASC\n    LIMIT 1\n  )\n  AND gb.points >= 20;\n```",
+                "computed_sql_query": "\nSELECT COUNT(*) AS nb_games\nFROM game_boxscore gb\nJOIN player p ON gb.player_id = p.id\nJOIN game_summary gs ON gb.game_id = gs.id\nWHERE p.player_name = 'Kevin Love'\n  AND gs.season_id IN (\n    SELECT ps.season_id\n    FROM player_season ps\n    WHERE ps.player_id = p.id\n    ORDER BY ps.season_id ASC\n    LIMIT 1\n  )\n  AND gb.points >= 20;\n",
+                "computed_result": "[{'nb_games': 8}]",
+                "is_correct": false
+            },
+            {
+                "question": "What is the maxiumum number of points scored by Damian Lillard in a single game during his first season ? Only retrieve the column max_points",
+                "expected_result": "[{'max_points': 38}]",
+                "llm_response": "```sql\nSELECT MAX(gs.points) AS max_points\nFROM game_boxscore gs\nJOIN player p ON gs.player_id = p.id\nJOIN player_season ps ON gs.player_id = ps.player_id AND gs.game_id IN (\n    SELECT id FROM game_summary WHERE season_id = ps.season_id\n)\nWHERE p.player_name = 'Damian Lillard'\nAND ps.nb_games = (\n    SELECT MIN(nb_games) \n    FROM player_season \n    JOIN player ON player_season.player_id = player.id \n    WHERE player.player_name = 'Damian Lillard'\n);\n```",
+                "computed_sql_query": "\nSELECT MAX(gs.points) AS max_points\nFROM game_boxscore gs\nJOIN player p ON gs.player_id = p.id\nJOIN player_season ps ON gs.player_id = ps.player_id AND gs.game_id IN (\n    SELECT id FROM game_summary WHERE season_id = ps.season_id\n)\nWHERE p.player_name = 'Damian Lillard'\nAND ps.nb_games = (\n    SELECT MIN(nb_games) \n    FROM player_season \n    JOIN player ON player_season.player_id = player.id \n    WHERE player.player_name = 'Damian Lillard'\n);\n",
+                "computed_result": "[{'max_points': 43}]",
+                "is_correct": false
+            },
+            {
+                "question": "Who are the 3 players with the most triple double during the season whose start year is 2022 ? Return the column player_name and num_triple_double ordered by num_triple_double in descending order.",
+                "expected_result": "[{'player_name': 'Nikola Joki\u0107', 'num_triple_double': 39}, {'player_name': 'Domantas Sabonis', 'num_triple_double': 14}, {'player_name': 'Luka Don\u010di\u0107', 'num_triple_double': 10}]",
+                "llm_response": "ERROR: Binder Error: column total_rebounds must appear in the GROUP BY clause or be used in an aggregate function",
+                "computed_sql_query": "",
+                "computed_result": "ERROR: Binder Error: column total_rebounds must appear in the GROUP BY clause or be used in an aggregate function",
+                "is_correct": false
+            },
+            {
+                "question": "How many triple doubles did James Harden do during the 2022 calendar season ? Return only the column num_triple_double.",
+                "expected_result": "[{'num_triple_double': 6}]",
+                "llm_response": "```sql\nSELECT COUNT(*) AS num_triple_double\nFROM game_boxscore gb\nJOIN player p ON gb.player_id = p.id\nJOIN game_summary gs ON gb.game_id = gs.id\nWHERE p.player_name = 'James Harden'\n  AND gs.date >= '2022-01-01'\n  AND gs.date <= '2022-12-31'\n  AND gb.points >= 10\n    AND gb.total_rebounds >= 10\n    AND gb.assists >= 10;\n```",
+                "computed_sql_query": "\nSELECT COUNT(*) AS num_triple_double\nFROM game_boxscore gb\nJOIN player p ON gb.player_id = p.id\nJOIN game_summary gs ON gb.game_id = gs.id\nWHERE p.player_name = 'James Harden'\n  AND gs.date >= '2022-01-01'\n  AND gs.date <= '2022-12-31'\n  AND gb.points >= 10\n    AND gb.total_rebounds >= 10\n    AND gb.assists >= 10;\n",
+                "computed_result": "[{'num_triple_double': 6}]",
+                "is_correct": true
+            }
+        ],
+        "accuracy": 0.65
+    },
+    {
         "llm_model": "deepseek/deepseek-chat-v3-0324:free",
         "test_cases_results": [
             {

@@ -88,6 +88,11 @@ LLM_MODELS = [
         api_key="ollama",
     ),
     LLMConnection(
+        model_id="unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_XL",
+        base_url="http://127.0.0.1:8080",
+        api_key="sk-no-key-required",
+    ),
+    LLMConnection(
         model_id="deepseek/deepseek-chat-v3-0324:free",
         base_url="https://openrouter.ai/api/v1",
         api_key=OPENROUTER_API_KEY,
