@@ -149,8 +149,9 @@ The `pdesj/Llama-3.2-1B-nba-ner-GGUF:Q4_K_M` model is especially fine-tuned for 
 | mistralai/mistral-small-3.2-24b-instruct | 60% | 60% |
 | openai/gpt-oss-20b | 85% | 90% |
 | hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL | 40% | 75% |
+| hf.co/unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_XL | 65% | 85% |
 
-** _Model name from OpenRouter except for Qwen3-30B-A3B._
+** _Model name from OpenRouter except for unsloth ones._
 
 
 <details>
