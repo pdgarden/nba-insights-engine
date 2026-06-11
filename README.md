@@ -12,6 +12,7 @@
   - [3.1 Set up](#31-set-up)
   - [3.2 Run](#32-run)
   - [3.3. Environment variables](#33-environment-variables)
+  - [3.4 MCP server](#34-mcp-server)
 - [4. Workflow](#4-workflow)
 - [5. Dataset](#5-dataset)
 - [6. Benchmarks](#6-benchmarks)
@@ -93,6 +94,43 @@ _\* Used through OpenAI SDK._
 
 
 To override the default values, you can set these environment variables directly in your environment, or in a `.env` file or at the repo's root. See .example in `env.example`
+
+## 3.4 MCP server
+
+The project exposes an [MCP](https://modelcontextprotocol.io/) server that gives any MCP-compatible client (Claude Desktop, Claude Code, etc.) direct access to the NBA database through three tools:
+
+| Tool | Description |
+|------|-------------|
+| `get_nba_database_schema` | Returns the full schema (tables + columns). Call this first. |
+| `query_database` | Executes a SQL SELECT and returns results (default limit: 100 rows). |
+| `search_player_by_name` | Fuzzy-searches players by name and returns their ids. |
+| `search_team_by_name` | Fuzzy-searches teams by name and returns their ids. |
+
+**Run standalone** (useful for testing):
+
+```sh
+uv run python app/mcp_server.py
+```
+
+**Integrate with Claude Desktop** — add the following to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "nba": {
+      "command": "uv",
+      "args": ["run", "python", "app/mcp_server.py"],
+      "cwd": "/absolute/path/to/nba-insights-engine"
+    }
+  }
+}
+```
+
+**Integrate with Claude Code** — run from the repo root:
+
+```sh
+claude mcp add nba -- uv run python app/mcp_server.py
+```
 
 # 4. Workflow
 

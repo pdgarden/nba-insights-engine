@@ -4,28 +4,12 @@
 
 from loguru import logger
 
-from app.db.dao import get_table_columns, get_tables
+from app.db.dao import get_db_description
 from app.llm import query_llm
 from app.prompts import QUESTION_TO_SQL
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # Functions
-
-
-def get_table_description(table_name: str) -> str:
-    """Generate the description of a table in natural language to be used by the LLM."""
-    table_description = f"Table: {table_name}"
-    for column_name, data_type in get_table_columns(table_name):
-        table_description += f"\n  - {column_name}: {data_type}"
-
-    return table_description
-
-
-def get_db_description() -> str:
-    """Generate the description of a database in natural language to be used by the LLM."""
-    tables_names = get_tables()
-    tables_desc = {table: get_table_description(table) for table in tables_names}
-    return "\n\n".join(tables_desc.values())
 
 
 def build_prompt(question: str, db_description: str, thinking_mode: bool) -> str:
@@ -41,7 +25,7 @@ def extract_sql_query(text: str) -> str:
         error_msg = "No SQL query found in text."
         raise ValueError(error_msg)
     start_index = text.find(sql_identifier)
-    return text[start_index + len(sql_identifier) :].split("```")[0]
+    return text[start_index + len(sql_identifier) :].split("```", maxsplit=1)[0]
 
 
 def generate_sql_query(question: str, thinking_mode: bool) -> str:
