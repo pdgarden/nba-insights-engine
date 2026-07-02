@@ -3,16 +3,6 @@ import pandas as pd
 from app.db.connection import con
 
 
-def get_players_names() -> list[str]:
-    """Retrieve list of player names available in the database."""
-    return [e[0] for e in con.sql("select distinct player_name from player").fetchall()]
-
-
-def get_teams_names() -> list[str]:
-    """Retrieve list of team names available in the database."""
-    return [e[0] for e in con.sql("select distinct team_name from team").fetchall()]
-
-
 def get_table_columns(table_name: str) -> list[tuple[str, str]]:
     """Retrieve list of columns name and type for a given table."""
     return [
