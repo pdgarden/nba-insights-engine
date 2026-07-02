@@ -1,12 +1,13 @@
+from app.db.dao import Player, Team
 from app.logic.ner_retrieval import get_closest_player_name, get_closest_team_name
 
 
 def test_get_closest_player_name() -> None:
     players = [
-        {"id": 1, "player_name": "LeBron James"},
-        {"id": 2, "player_name": "Stephen Curry"},
-        {"id": 3, "player_name": "Kevin Durant"},
-        {"id": 4, "player_name": "James Harden"},
+        Player(id=1, player_name="LeBron James"),
+        Player(id=2, player_name="Stephen Curry"),
+        Player(id=3, player_name="Kevin Durant"),
+        Player(id=4, player_name="James Harden"),
     ]
 
     # Test exact match
@@ -24,10 +25,10 @@ def test_get_closest_player_name() -> None:
 
 def test_get_closest_team_name() -> None:
     teams = [
-        {"id": 1, "team_name": "Los Angeles Lakers"},
-        {"id": 2, "team_name": "Golden State Warriors"},
-        {"id": 3, "team_name": "Brooklyn Nets"},
-        {"id": 4, "team_name": "Miami Heat"},
+        Team(id=1, team_name="Los Angeles Lakers"),
+        Team(id=2, team_name="Golden State Warriors"),
+        Team(id=3, team_name="Brooklyn Nets"),
+        Team(id=4, team_name="Miami Heat"),
     ]
 
     # Test exact match
