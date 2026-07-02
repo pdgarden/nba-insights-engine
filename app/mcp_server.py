@@ -1,10 +1,13 @@
 import json
+from typing import TypeVar
 
 from mcp.server.fastmcp import FastMCP
 
 from app.db import dao
-from app.db.dao import get_db_description, sql_to_df
+from app.db.dao import Player, Team, get_db_description, sql_to_df
 from app.logic.fuzzy_search import top_matches
+
+NamedRecordT = TypeVar("NamedRecordT", Player, Team)
 
 mcp = FastMCP(
     "nba",
@@ -52,10 +55,10 @@ async def query_database(sql: str, limit: int = 100) -> str:
         return result
 
 
-def _search_by_name(query: str, items: list[dict], name_field: str) -> str:
-    """Fuzzy-search `items` (each a dict with an `id` and `name_field` key) and return the top 10 matches as JSON."""
-    names = [item[name_field] for item in items]
-    id_by_name = {item[name_field]: item["id"] for item in items}
+def _search_by_name(query: str, items: list[NamedRecordT], name_field: str) -> str:
+    """Fuzzy-search `items` (each has an `id` and `name_field` attribute) and return the top 10 matches as JSON."""
+    names = [getattr(item, name_field) for item in items]
+    id_by_name = {getattr(item, name_field): item.id for item in items}
     matches = top_matches(query, names, limit=10)
     results = [{"id": id_by_name[m[0]], name_field: m[0], "score": round(m[1], 1)} for m in matches]
     return json.dumps(results, indent=2)

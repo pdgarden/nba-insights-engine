@@ -1,6 +1,24 @@
 import pandas as pd
+from pydantic import BaseModel
 
 from app.db.connection import con
+
+# -------------------------------------------------------------------------------------------------------------------- #
+# Models
+
+
+class Player(BaseModel):
+    id: int
+    player_name: str
+
+
+class Team(BaseModel):
+    id: int
+    team_name: str
+
+
+# -------------------------------------------------------------------------------------------------------------------- #
+# Functions
 
 
 def get_table_columns(table_name: str) -> list[tuple[str, str]]:
@@ -27,20 +45,14 @@ def sql_to_df(sql_query: str) -> pd.DataFrame:
     return con.sql(sql_query).df()
 
 
-def get_all_players() -> list[dict]:
+def get_all_players() -> list[Player]:
     """Retrieve list of players with id and name."""
-    return [
-        {"id": e[0], "player_name": e[1]}
-        for e in con.sql("SELECT id, player_name FROM player").fetchall()
-    ]
+    return [Player(id=e[0], player_name=e[1]) for e in con.sql("SELECT id, player_name FROM player").fetchall()]
 
 
-def get_all_teams() -> list[dict]:
+def get_all_teams() -> list[Team]:
     """Retrieve list of teams with id and name."""
-    return [
-        {"id": e[0], "team_name": e[1]}
-        for e in con.sql("SELECT id, team_name FROM team").fetchall()
-    ]
+    return [Team(id=e[0], team_name=e[1]) for e in con.sql("SELECT id, team_name FROM team").fetchall()]
 
 
 def get_table_description(table_name: str) -> str:

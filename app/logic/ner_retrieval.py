@@ -4,7 +4,7 @@
 # Imports
 from pydantic import BaseModel
 
-from app.db.dao import get_all_players, get_all_teams
+from app.db.dao import Player, Team, get_all_players, get_all_teams
 from app.llm import query_llm
 from app.logic.fuzzy_search import top_matches
 from app.prompts import NER_RETRIEVAL
@@ -29,15 +29,15 @@ def get_ner_prompt(text: str) -> str:
     return NER_RETRIEVAL.format(text=text, expected_json_schema=PlayersAndTeams.model_json_schema())
 
 
-def get_closest_player_name(player_name: str, players: list[dict]) -> str:
+def get_closest_player_name(player_name: str, players: list[Player]) -> str:
     """Find the closest player name in the database from an input given name."""
-    players_names = [p["player_name"] for p in players]
+    players_names = [p.player_name for p in players]
     return top_matches(player_name, players_names, limit=1)[0][0]
 
 
-def get_closest_team_name(team_name: str, teams: list[dict]) -> str:
+def get_closest_team_name(team_name: str, teams: list[Team]) -> str:
     """Find the closest team name in the database from an input given name."""
-    teams_names = [t["team_name"] for t in teams]
+    teams_names = [t.team_name for t in teams]
     return top_matches(team_name, teams_names, limit=1)[0][0]
 
 
