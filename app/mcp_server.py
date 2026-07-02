@@ -1,10 +1,10 @@
 import json
 
 from mcp.server.fastmcp import FastMCP
-from rapidfuzz import process as fuzz_process
 
 from app.db import dao
 from app.db.dao import get_db_description, sql_to_df
+from app.logic.fuzzy_search import top_matches
 
 mcp = FastMCP(
     "nba",
@@ -36,8 +36,7 @@ async def query_database(sql: str, limit: int = 100) -> str:
 
     Args:
         sql: A valid SQL SELECT statement.
-
-                limit: Maximum number of rows to return (default 100).
+        limit: Maximum number of rows to return (default 100).
     """
     try:
         limited_sql = f"SELECT * FROM ({sql}) AS __q LIMIT {limit}"
@@ -53,6 +52,15 @@ async def query_database(sql: str, limit: int = 100) -> str:
         return result
 
 
+def _search_by_name(query: str, items: list[dict], name_field: str) -> str:
+    """Fuzzy-search `items` (each a dict with an `id` and `name_field` key) and return the top 10 matches as JSON."""
+    names = [item[name_field] for item in items]
+    id_by_name = {item[name_field]: item["id"] for item in items}
+    matches = top_matches(query, names, limit=10)
+    results = [{"id": id_by_name[m[0]], name_field: m[0], "score": round(m[1], 1)} for m in matches]
+    return json.dumps(results, indent=2)
+
+
 @mcp.tool()
 async def search_player_by_name(player_name: str) -> str:
     """Find the top 10 closest player names in the database for a given query.
@@ -62,12 +70,7 @@ async def search_player_by_name(player_name: str) -> str:
     Args:
         player_name: A partial or approximate player name to search for.
     """
-    players = dao.get_all_players()
-    names = [p["player_name"] for p in players]
-    id_by_name = {p["player_name"]: p["id"] for p in players}
-    matches = fuzz_process.extract(player_name, names, limit=10, processor=str.casefold)
-    results = [{"id": id_by_name[m[0]], "player_name": m[0], "score": round(m[1], 1)} for m in matches]
-    return json.dumps(results, indent=2)
+    return _search_by_name(player_name, dao.get_all_players(), "player_name")
 
 
 @mcp.tool()
@@ -79,12 +82,7 @@ async def search_team_by_name(team_name: str) -> str:
     Args:
         team_name: A partial or approximate team name to search for.
     """
-    teams = dao.get_all_teams()
-    names = [t["team_name"] for t in teams]
-    id_by_name = {t["team_name"]: t["id"] for t in teams}
-    matches = fuzz_process.extract(team_name, names, limit=10, processor=str.casefold)
-    results = [{"id": id_by_name[m[0]], "team_name": m[0], "score": round(m[1], 1)} for m in matches]
-    return json.dumps(results, indent=2)
+    return _search_by_name(team_name, dao.get_all_teams(), "team_name")
 
 
 def main() -> None:
