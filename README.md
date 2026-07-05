@@ -97,7 +97,7 @@ To override the default values, you can set these environment variables directly
 
 ## 3.4 MCP server
 
-The project exposes an [MCP](https://modelcontextprotocol.io/) server that gives any MCP-compatible client (Claude Desktop, Claude Code, etc.) direct access to the NBA database through three tools:
+The project exposes an [MCP](https://modelcontextprotocol.io/) server that gives any MCP-compatible client (Claude Desktop, Claude Code, etc.) direct access to the NBA database through four tools:
 
 | Tool | Description |
 |------|-------------|
