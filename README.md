@@ -106,31 +106,34 @@ The project exposes an [MCP](https://modelcontextprotocol.io/) server that gives
 | `search_player_by_name` | Fuzzy-searches players by name and returns their ids. |
 | `search_team_by_name` | Fuzzy-searches teams by name and returns their ids. |
 
-**Run standalone** (useful for testing):
+<details>
+<summary><strong>Run standalone</strong></summary>
+Useful for testing
 
 ```sh
 uv run python app/mcp_server.py
 ```
+</details>
 
-**Integrate with Claude Desktop** — add the following to your `claude_desktop_config.json`:
+
+<details>
+<summary><strong>Integrate with Claude Desktop</strong></summary>
+
+Add the following to your `claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "nba": {
       "command": "uv",
-      "args": ["run", "python", "app/mcp_server.py"],
-      "cwd": "/absolute/path/to/nba-insights-engine"
+      "args": ["--directory", "path/to/nba-insights-engine", "run", "app/mcp_server.py"],
     }
   }
 }
 ```
 
-**Integrate with Claude Code** — run from the repo root:
+</details>
 
-```sh
-claude mcp add nba -- uv run python app/mcp_server.py
-```
 
 # 4. Workflow
 
