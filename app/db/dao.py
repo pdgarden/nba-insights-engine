@@ -8,12 +8,12 @@ from app.db.connection import con
 
 
 class Player(BaseModel):
-    id: int
+    id: str
     player_name: str
 
 
 class Team(BaseModel):
-    id: int
+    id: str
     team_name: str
 
 
